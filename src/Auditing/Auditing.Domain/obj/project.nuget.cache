@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "TRLDaKmw7HSHIBB9ZjxTBJ8rO2nv/3dHOPLX0ChoaXk+uFqgLNa4cRPGj+E050cOz4i5RGd6MofSLSxdkukJWg==",
+  "success": true,
+  "projectFilePath": "D:\\Projects\\2020\\src\\Auditing\\Auditing.Domain\\Auditing.Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\admin\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

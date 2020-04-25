@@ -1,0 +1,12 @@
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\obj\Debug\netstandard2.1\Auditing.Infrastructure.csprojAssemblyReference.cache
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\obj\Debug\netstandard2.1\Auditing.Infrastructure.AssemblyInfoInputs.cache
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\obj\Debug\netstandard2.1\Auditing.Infrastructure.AssemblyInfo.cs
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\bin\Debug\netstandard2.1\Auditing.Infrastructure.deps.json
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\bin\Debug\netstandard2.1\Auditing.Infrastructure.dll
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\bin\Debug\netstandard2.1\Auditing.Infrastructure.pdb
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\bin\Debug\netstandard2.1\Auditing.Domain.dll
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\bin\Debug\netstandard2.1\Auditing.Domain.pdb
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\obj\Debug\netstandard2.1\Auditing.Infrastructure.csproj.CopyComplete
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\obj\Debug\netstandard2.1\Auditing.Infrastructure.dll
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\obj\Debug\netstandard2.1\Auditing.Infrastructure.pdb
+D:\Projects\2020\src\Auditing\Auditing.Infrastructure\obj\Debug\netstandard2.1\Auditing.Infrastructure.csproj.CoreCompileInputs.cache
