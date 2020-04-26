@@ -10,24 +10,26 @@ namespace Auditing.Infrastructure
 {
     public class AuditEntry
     {
-        private readonly AuditConfig _auditConfig;
         private string TableName { get; set; }
+        private readonly EntityEntry _entityEntry;
+        private readonly AuditConfig _auditConfig;
         public OperationType OperationType { get; set; }
         public Dictionary<string, object> OldValues { get; private set; }
         public Dictionary<string, object> NewValues { get; private set; }
         public Dictionary<string, object> ExtraData { get; private set; }
-        public List<PropertyEntry> TemporaryProperties { get; set; } = new List<PropertyEntry>();
+        private List<PropertyEntry> TemporaryProperties { get; set; } = new List<PropertyEntry>();
 
         public AuditEntry(EntityEntry entityEntry, AuditConfig auditConfig)
         {
             _auditConfig = auditConfig;
+            _entityEntry = entityEntry;
             TableName = entityEntry.Metadata.GetTableName();
             OldValues = new Dictionary<string, object>();
             NewValues = new Dictionary<string, object>();
             ExtraData = new Dictionary<string, object>();
-            OperationType = SetOperationType(entityEntry);
-            SetValuesCollection(entityEntry);
-            SetTemporaryProperties(entityEntry);
+            OperationType = GetOperationType();
+            SetValuesCollection(_entityEntry.Properties.ToList().FindAll(property => !property.IsTemporary).ToList());
+            InitTemporaryProperties();
         }
 
         public AuditLog AsAuditLog()
@@ -45,10 +47,19 @@ namespace Auditing.Infrastructure
             };
         }
 
-        private OperationType SetOperationType(EntityEntry entityEntry)
+        public void UpdateTemporaryProperties()
+        {
+            if (TemporaryProperties == null || !TemporaryProperties.Any())
+                return;
+
+            SetValuesCollection(TemporaryProperties);
+            TemporaryProperties = null;
+        }
+
+        private OperationType GetOperationType()
         {
             var opType = OperationType.Created;
-            switch (entityEntry.State)
+            switch (_entityEntry.State)
             {
                 case EntityState.Added:
                     opType = OperationType.Created;
@@ -64,43 +75,43 @@ namespace Auditing.Infrastructure
             return opType;
         }
 
-        public void SetValuesCollection(EntityEntry entityEntry, List<PropertyEntry> properties)
+        private void SetValuesCollection(List<PropertyEntry> properties)
         {
-            foreach(var property in properties)
+            foreach (var property in properties)
             {
                 var propertyName = property.Metadata.GetColumnName();
-                if (_auditConfig.PropertyFilters.Any(x => x(entityEntry, property)))
+                if (_auditConfig.PropertyFilters.Any(x => x(_entityEntry, property)))
                     continue;
 
-                switch (entityEntry.State)
+                switch (OperationType)
                 {
-                    case EntityState.Added:
-                        NewValues.AddOrUpdate(propertyName, property.CurrentValue);
+                    case OperationType.Created:
+                        NewValues[propertyName] = property.CurrentValue;
                         break;
-                    case EntityState.Modified:
-                        if (!_auditConfig.IsIgnoreSameValue || property.OriginalValue.ToString() == property.CurrentValue.ToString())
-                        OldValues.AddOrUpdate(propertyName, property.OriginalValue);
-                        NewValues.AddOrUpdate(propertyName, property.CurrentValue);
+                    case OperationType.Updated:
+                        if (_auditConfig.IsIgnoreSameValue && property.OriginalValue.ToString() == property.CurrentValue.ToString())
+                            continue;
+                        OldValues[propertyName] = property.OriginalValue;
+                        NewValues[propertyName] = property.CurrentValue;
                         break;
-                    case EntityState.Deleted:
-                        NewValues.AddOrUpdate(propertyName, property.OriginalValue);
+                    case OperationType.Deleted:
+                        OldValues[propertyName] = property.OriginalValue;
                         break;
                 }
             };
         }
 
-        private void GetTemporaryProperties(EntityEntry entityEntry)
+        private void InitTemporaryProperties()
         {
-            TemporaryProperties = entityEntry.Properties.ToList().FindAll(property => property.IsTemporary).ToList();
+            TemporaryProperties = _entityEntry.Properties.ToList().FindAll(property => property.IsTemporary).ToList();
         }
     }
 
     public static class DictionaryExtension
     {
-        public static void AddOrUpdate<TKey,TValue>(this Dictionary<TKey,TValue> dict, TKey key, TValue value)
+        public static void AddOrUpdate<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key, TValue value)
         {
-            var action = dict.ContainsKey(key) ? new Action(() => dict[key] = value) : new Action(() => dict.Add(key, value));
-            action();
+            (dict.ContainsKey(key) ? new Action(() => dict[key] = value) : new Action(() => dict.Add(key, value)))();
         }
     }
 }

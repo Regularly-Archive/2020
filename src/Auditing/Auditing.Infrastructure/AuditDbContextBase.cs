@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Auditing.Infrastructure
 {
-    public class AuditDbContextBase : DbContext
+    public class AuditDbContextBase : DbContext, IAuditStorage
     {
         private readonly AuditConfig _auditConfig;
         private List<AuditEntry> _auditEntries;
@@ -23,12 +23,6 @@ namespace Auditing.Infrastructure
         {
             _auditConfig = auditConfig;
         }
-
-        public AuditDbContextBase(DbContextOptions options) : base(options)
-        {
-
-        }
-
 
         public virtual Task BeforeSaveChanges()
         {
@@ -57,28 +51,7 @@ namespace Auditing.Infrastructure
 
             foreach (var auditEntry in _auditEntries)
             {
-                if (auditEntry.TemporaryProperties == null || !auditEntry.TemporaryProperties.Any())
-                    continue;
-
-                foreach (var temporaryProperty in auditEntry.TemporaryProperties)
-                {
-                    var fieldName = temporaryProperty.Metadata.GetFieldName();
-                    switch (auditEntry.OperationType)
-                    {
-                        case Domain.OperationType.Created:
-                            auditEntry.NewValues[fieldName] = temporaryProperty.CurrentValue;
-                            break;
-                        case Domain.OperationType.Updated:
-                            auditEntry.OldValues[fieldName] = temporaryProperty.OriginalValue;
-                            auditEntry.NewValues[fieldName] = temporaryProperty.CurrentValue;
-                            break;
-                        case Domain.OperationType.Deleted:
-                            auditEntry.OldValues[fieldName] = temporaryProperty.OriginalValue;
-                            break;
-                    }
-                }
-
-                auditEntry.TemporaryProperties = null;
+                auditEntry.UpdateTemporaryProperties();
             }
 
             //扩展字段
@@ -93,14 +66,11 @@ namespace Auditing.Infrastructure
             //保存审计日志
             var auditLogs = _auditEntries.Select(x => x.AsAuditLog()).ToArray();
             if (!_auditConfig.AuditStorages.Any())
-            {
-                SaveAuditLogs(auditLogs);
-            }
-            else
-            {
-                _auditConfig.AuditStorages.ForEach(auditStorage => auditStorage.SaveAuditLogs(auditLogs));
+                _auditConfig.AuditStorages.Add(this);
+            _auditConfig.AuditStorages.ForEach(
+                auditStorage => auditStorage.SaveAuditLogs(auditLogs)
+            );
 
-            }
             return Task.CompletedTask;
         }
 
@@ -134,7 +104,7 @@ namespace Auditing.Infrastructure
             builder.ApplyConfiguration(new AuditLogConfiguration());
         }
 
-        private void SaveAuditLogs(params AuditLog[] auditLogs)
+        void IAuditStorage.SaveAuditLogs(params AuditLog[] auditLogs)
         {
             AuditLog.AddRange(auditLogs);
             base.SaveChangesAsync();

@@ -51,7 +51,6 @@ D:\Projects\2020\src\Auditing\Auditing.Api\obj\Debug\netcoreapp3.1\staticwebasse
 D:\Projects\2020\src\Auditing\Auditing.Api\obj\Debug\netcoreapp3.1\staticwebassets\Auditing.Api.StaticWebAssets.xml
 D:\Projects\2020\src\Auditing\Auditing.Api\obj\Debug\netcoreapp3.1\Auditing.Api.dll
 D:\Projects\2020\src\Auditing\Auditing.Api\obj\Debug\netcoreapp3.1\Auditing.Api.pdb
-D:\Projects\2020\src\Auditing\Auditing.Api\obj\Debug\netcoreapp3.1\Auditing.Api.genruntimeconfig.cache
 D:\Projects\2020\src\Auditing\Auditing.Api\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Design.dll
 D:\Projects\2020\src\Auditing\Auditing.Api\obj\Debug\netcoreapp3.1\Auditing.Api.csproj.CoreCompileInputs.cache
 D:\Projects\2020\src\Auditing\Auditing.Api\obj\Debug\netcoreapp3.1\Auditing.Api.MvcApplicationPartsAssemblyInfo.cache
