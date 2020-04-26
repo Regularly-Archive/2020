@@ -64,38 +64,43 @@ namespace Auditing.Infrastructure
             return opType;
         }
 
-        private void SetValuesCollection(EntityEntry entityEntry)
+        public void SetValuesCollection(EntityEntry entityEntry, List<PropertyEntry> properties)
         {
-            var properties = entityEntry.Properties.ToList().FindAll(property => !property.IsTemporary).ToList();
             foreach(var property in properties)
             {
+                var propertyName = property.Metadata.GetColumnName();
                 if (_auditConfig.PropertyFilters.Any(x => x(entityEntry, property)))
                     continue;
-
-                //确保字典内Key存在
-                var fieldName = property.Metadata.GetColumnName();
-                NewValues.Add(fieldName, null);
-                OldValues.Add(fieldName, null);
 
                 switch (entityEntry.State)
                 {
                     case EntityState.Added:
-                        NewValues[fieldName] = property.CurrentValue;
+                        NewValues.AddOrUpdate(propertyName, property.CurrentValue);
                         break;
                     case EntityState.Modified:
-                        OldValues[fieldName] = property.OriginalValue;
-                        NewValues[fieldName] = property.CurrentValue;
+                        if (!_auditConfig.IsIgnoreSameValue || property.OriginalValue.ToString() == property.CurrentValue.ToString())
+                        OldValues.AddOrUpdate(propertyName, property.OriginalValue);
+                        NewValues.AddOrUpdate(propertyName, property.CurrentValue);
                         break;
                     case EntityState.Deleted:
-                        OldValues[fieldName] = property.OriginalValue;
+                        NewValues.AddOrUpdate(propertyName, property.OriginalValue);
                         break;
                 }
             };
         }
 
-        private List<PropertyEntry> SetTemporaryProperties(EntityEntry entityEntry)
+        private void GetTemporaryProperties(EntityEntry entityEntry)
         {
-            return entityEntry.Properties.ToList().FindAll(property => property.IsTemporary).ToList();
+            TemporaryProperties = entityEntry.Properties.ToList().FindAll(property => property.IsTemporary).ToList();
+        }
+    }
+
+    public static class DictionaryExtension
+    {
+        public static void AddOrUpdate<TKey,TValue>(this Dictionary<TKey,TValue> dict, TKey key, TValue value)
+        {
+            var action = dict.ContainsKey(key) ? new Action(() => dict[key] = value) : new Action(() => dict.Add(key, value));
+            action();
         }
     }
 }

@@ -13,6 +13,8 @@ namespace Auditing.Infrastructure
 
         public bool IsIgnoreSameValue { get; private set; } = false;
 
+        public IUserInfoProvider UserInfoProvider { get; set; }
+
         public List<IAuditStorage> AuditStorages { get; private set; }
 
         public List<Func<EntityEntry, bool>> EntityFilters { get; private set; }
@@ -31,19 +33,19 @@ namespace Auditing.Infrastructure
 
         public AuditConfig IgnoreTable(string tableName)
         {
-            EntityFilters.Add(entity => entity.Metadata.GetTableName() != tableName);
+            EntityFilters.Add(entity => entity.Metadata.GetTableName() == tableName);
             return this;
         }
 
         public AuditConfig IgnoreTable(Type type)
         {
-            EntityFilters.Add(entity => entity.GetType() != type);
+            EntityFilters.Add(entity => entity.GetType() == type);
             return this;
         }
 
         public AuditConfig IgnoreTable<Entity>()
         {
-            EntityFilters.Add(entity => entity.GetType() != typeof(Entity));
+            EntityFilters.Add(entity => entity.GetType() == typeof(Entity));
             return this;
         }
 
@@ -55,13 +57,13 @@ namespace Auditing.Infrastructure
 
         public AuditConfig IgnoreProperty(string propertyName)
         {
-            PropertyFilters.Add((entity, property) => property.Metadata.GetColumnName() != propertyName);
+            PropertyFilters.Add((entity, property) => property.Metadata.GetColumnName() == propertyName);
             return this;
         }
 
         public AuditConfig IgnoreProperty(string tableName, string propertyName)
         {
-            PropertyFilters.Add((entity, property) => entity.Metadata.GetTableName() != tableName && property.Metadata.GetColumnName() != propertyName);
+            PropertyFilters.Add((entity, property) => entity.Metadata.GetTableName() == tableName && property.Metadata.GetColumnName() == propertyName);
             return this;
         }
 
@@ -76,7 +78,7 @@ namespace Auditing.Infrastructure
 
             var propertyName = body.Member.Name;
             PropertyFilters.Add((entity, property) =>
-                entity.Metadata.GetTableName() != typeof(Entity).Name && property.Metadata.GetColumnName() != propertyName
+                entity.Metadata.GetTableName() == typeof(Entity).Name && property.Metadata.GetColumnName() == propertyName
             );
             return this;
         }
@@ -105,9 +107,14 @@ namespace Auditing.Infrastructure
             return this;
         }
 
-        public AuditConfig WithStorage<Storage>() where Storage:IAuditStorage
+        public AuditConfig WithStorage<TStorage>() where TStorage:IAuditStorage
         {
 
+            return this;
+        }
+
+        public AuditConfig WithUserInfoProvider<TProvider>()where TProvider : IUserInfoProvider
+        {
             return this;
         }
 
