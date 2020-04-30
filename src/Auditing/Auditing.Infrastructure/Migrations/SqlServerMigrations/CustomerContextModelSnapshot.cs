@@ -56,6 +56,36 @@ namespace Auditing.Infrastructure.Migrations.SqlServerMigrations
                     b.ToTable("AuditLog");
                 });
 
+            modelBuilder.Entity("Auditing.Domain.BusinessUnit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IsActive")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrgCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OrgName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ParentOrg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BusinessUnit");
+                });
+
             modelBuilder.Entity("Auditing.Domain.Customer", b =>
                 {
                     b.Property<int>("Id")

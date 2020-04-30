@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Dapper.Contrib.Extensions;
+using System;
 
 namespace Auditing.Domain
 {
+    [Table("Customer")]
     public class Customer : BaseEntity<int>
     {
         public string Tel { get; set; }

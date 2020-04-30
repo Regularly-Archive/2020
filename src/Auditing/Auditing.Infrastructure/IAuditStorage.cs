@@ -7,6 +7,6 @@ namespace Auditing.Infrastructure
 {
     public interface IAuditStorage
     {
-        void SaveAuditLogs(params AuditLog[] auditLogs);
+        public void SaveAuditLogs(params AuditLog[] auditLogs);
     }
 }

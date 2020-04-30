@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Auditing.Domain;
 using Auditing.Infrastructure;
+using Auditing.Infrastructure.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +41,9 @@ namespace Auditing.Api
             );
             services.AddDbContext<CustomerContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped<IDbConnection>(x => new SqlConnection(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped(typeof(IRepository), typeof(DapperRepository));
+            services.AddScoped(typeof(IUnitOfWork), typeof(DapperUnitOfWork));
             services.AddControllers();
         }
 

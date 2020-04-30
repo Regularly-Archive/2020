@@ -13,6 +13,7 @@ namespace Auditing.Infrastructure
     public class CustomerContext : AuditDbContextBase
     {
         public DbSet<Customer> Customer { get; set; }
+        public DbSet<BusinessUnit> BusinessUnit { get; set; }
 
         public CustomerContext(DbContextOptions options,AuditConfig auditConfig) : base(options, auditConfig)
         {

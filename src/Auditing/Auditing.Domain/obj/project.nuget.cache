@@ -1,11 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "gUfL/gsk8X3+vfPdNFXmCa0c0XjJyEtiKfhebQPRR+ADgXMEbNg/Uoflj/jkbDCpbMNtO7e18SRq20Bzpubvuw==",
+  "dgSpecHash": "VgoQ8JXSv221n8ypaMts/jVt4wNCCfjtIG02fOH56E4ZR91SvtnHrdBs6WeYkdSAjoV3120HeCc8rvY5SSIA8A==",
   "success": true,
   "projectFilePath": "D:\\Projects\\2020\\src\\Auditing\\Auditing.Domain\\Auditing.Domain.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\admin\\.nuget\\packages\\dapper\\2.0.35\\dapper.2.0.35.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\dapper.contrib\\2.0.35\\dapper.contrib.2.0.35.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\system.reflection.emit\\4.7.0\\system.reflection.emit.4.7.0.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\system.reflection.emit.ilgeneration\\4.7.0\\system.reflection.emit.ilgeneration.4.7.0.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\system.reflection.emit.lightweight\\4.7.0\\system.reflection.emit.lightweight.4.7.0.nupkg.sha512"
   ],
   "logs": []
 }

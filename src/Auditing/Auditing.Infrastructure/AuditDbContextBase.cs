@@ -49,21 +49,8 @@ namespace Auditing.Infrastructure
             if (_auditEntries == null || !_auditEntries.Any())
                 return Task.CompletedTask;
 
-            foreach (var auditEntry in _auditEntries)
-            {
-                auditEntry.UpdateTemporaryProperties();
-            }
+            _auditEntries.ForEach(auditEntry => auditEntry.UpdateTemporaryProperties());
 
-            //扩展字段
-            foreach (var auditEntry in _auditEntries)
-            {
-                if (_auditConfig.PropertyEnrichers != null && _auditConfig.PropertyEnrichers.Any())
-                {
-                    _auditConfig.PropertyEnrichers.ForEach(x => x(auditEntry.ExtraData));
-                }
-            }
-
-            //保存审计日志
             var auditLogs = _auditEntries.Select(x => x.AsAuditLog()).ToArray();
             if (!_auditConfig.AuditStorages.Any())
                 _auditConfig.AuditStorages.Add(this);
@@ -104,7 +91,7 @@ namespace Auditing.Infrastructure
             builder.ApplyConfiguration(new AuditLogConfiguration());
         }
 
-        void IAuditStorage.SaveAuditLogs(params AuditLog[] auditLogs)
+        public void SaveAuditLogs(params AuditLog[] auditLogs)
         {
             AuditLog.AddRange(auditLogs);
             base.SaveChangesAsync();

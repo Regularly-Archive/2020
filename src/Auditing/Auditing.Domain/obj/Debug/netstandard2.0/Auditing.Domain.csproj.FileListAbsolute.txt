@@ -1,9 +1,9 @@
 D:\Projects\2020\src\Auditing\Auditing.Domain\bin\Debug\netstandard2.0\Auditing.Domain.deps.json
 D:\Projects\2020\src\Auditing\Auditing.Domain\bin\Debug\netstandard2.0\Auditing.Domain.dll
 D:\Projects\2020\src\Auditing\Auditing.Domain\bin\Debug\netstandard2.0\Auditing.Domain.pdb
-D:\Projects\2020\src\Auditing\Auditing.Domain\obj\Debug\netstandard2.0\Auditing.Domain.csproj.CoreCompileInputs.cache
 D:\Projects\2020\src\Auditing\Auditing.Domain\obj\Debug\netstandard2.0\Auditing.Domain.AssemblyInfoInputs.cache
 D:\Projects\2020\src\Auditing\Auditing.Domain\obj\Debug\netstandard2.0\Auditing.Domain.AssemblyInfo.cs
 D:\Projects\2020\src\Auditing\Auditing.Domain\obj\Debug\netstandard2.0\Auditing.Domain.dll
 D:\Projects\2020\src\Auditing\Auditing.Domain\obj\Debug\netstandard2.0\Auditing.Domain.pdb
 D:\Projects\2020\src\Auditing\Auditing.Domain\obj\Debug\netstandard2.0\Auditing.Domain.csprojAssemblyReference.cache
+D:\Projects\2020\src\Auditing\Auditing.Domain\obj\Debug\netstandard2.0\Auditing.Domain.csproj.CoreCompileInputs.cache
