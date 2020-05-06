@@ -5,7 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Auditing.Domain;
 using Auditing.Infrastructure;
+using Auditing.Infrastructure.Interceptors;
 using Auditing.Infrastructure.Repository;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Autofac.Extras.DynamicProxy;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -45,6 +49,15 @@ namespace Auditing.Api
             services.AddScoped(typeof(IRepository), typeof(DapperRepository));
             services.AddScoped(typeof(IUnitOfWork), typeof(DapperUnitOfWork));
             services.AddControllers();
+        }
+
+        
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            builder.RegisterType<DapperRepository>().As<IRepository>()
+                .InterceptedBy(typeof(AuditLogInterceptor))
+                .EnableInterfaceInterceptors();
+            builder.RegisterType<AuditLogInterceptor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

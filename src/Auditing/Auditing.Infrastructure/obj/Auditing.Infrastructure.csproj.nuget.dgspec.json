@@ -107,9 +107,21 @@
       "frameworks": {
         "netstandard2.1": {
           "dependencies": {
-            "Castle.DynamicProxy": {
+            "Autofac": {
               "target": "Package",
-              "version": "[2.2.0, )"
+              "version": "[5.1.4, )"
+            },
+            "Autofac.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "Autofac.Extras.DynamicProxy": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
+            "Castle.Core": {
+              "target": "Package",
+              "version": "[4.4.0, )"
             },
             "Dapper": {
               "target": "Package",
@@ -142,6 +154,10 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[12.0.3, )"
+            },
+            "System.Reflection.Emit": {
+              "target": "Package",
+              "version": "[4.7.0, )"
             }
           },
           "imports": [

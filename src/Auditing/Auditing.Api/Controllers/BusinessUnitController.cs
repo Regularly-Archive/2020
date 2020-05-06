@@ -21,13 +21,11 @@ namespace Auditing.Api.Controllers
         private readonly ILogger<BusinessUnitController> _logger;
         private readonly IRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
-        private IRepository _repositoryProxy;
         public BusinessUnitController(ILogger<BusinessUnitController> logger, IRepository repository, IUnitOfWork unitOfWork)
         {
             _logger = logger;
             _repository = repository;
             _unitOfWork = unitOfWork;
-            //_repositoryProxy = (new Castle.DynamicProxy.ProxyGenerator().CreateInterfaceProxyWithTarget(typeof(IRepository), _repository, new AuditLogInterceptor())) as IRepository;
         }
 
         // GET: api/<controller>
@@ -42,9 +40,24 @@ namespace Auditing.Api.Controllers
         {
             if (!item.CreatedAt.HasValue)
                 item.CreatedAt = DateTime.Now;
-            //_repository.Insert(item);
+            _repository.Insert(item);
             _unitOfWork.Commit();
             return item;
+        }
+
+        [HttpPut]
+        public BusinessUnit Put(BusinessUnit item)
+        {
+            var record = _repository.GetByID<BusinessUnit>(item.Id);
+            if (record == null)
+                return null;
+
+            record.OrgCode = item.OrgCode;
+            record.OrgName = item.OrgName;
+            record.IsActive = item.IsActive;
+            _repository.Update(record);
+            _unitOfWork.Commit();
+            return record;
         }
     }
 }
