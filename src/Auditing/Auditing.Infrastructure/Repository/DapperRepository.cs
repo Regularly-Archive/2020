@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore.SqlServer.Internal;
 using Microsoft.Data.SqlClient;
 using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore.Internal;
+using System.Threading;
 
 namespace Auditing.Infrastructure.Repository
 {
@@ -87,14 +89,40 @@ namespace Auditing.Infrastructure.Repository
             entities.ToList().ForEach(entity => _connection.Update(entity, _unitOfWork.Transaction));
         }
 
-        IEnumerable<TEntity> IRepository.GetByQuery<TEntity>(Expression<Func<TEntity,bool>> exps) where TEntity : class
+        public IEnumerable<TEntity> GetByQuery<TEntity>(Expression<Func<TEntity, bool>> exps) where TEntity : class
         {
             return _connection.GetAll<TEntity>().Where(exps.Compile()).ToList();
         }
 
-        IEnumerable<TEntity> IRepository.GetByQuery<TEntity>(string sql, object param)
+        public IEnumerable<TEntity> GetByQuery<TEntity>(string sql, object param) where TEntity : class
         {
             return _connection.Query<TEntity>(sql, param);
+        }
+
+        public IEnumerable<TEntity> GetByQuery<TEntity>(SearchParameters searchParameters) where TEntity : class
+        {
+            var builder = new StringBuilder($"SELECT * FROM {typeof(TEntity).Name}");
+
+            //构建Where语句
+            var sqlWhere = searchParameters.BuildSqlWhere();
+            if (!string.IsNullOrEmpty(sqlWhere.Item1))
+                builder.Append(sqlWhere.Item1);
+
+            //构建Order By语句
+            var sqlOrderBy = searchParameters.BuildSqlOrderBy();
+            if (!string.IsNullOrEmpty(sqlOrderBy))
+                builder.Append(sqlOrderBy);
+
+            //构建Limit语句
+            var sqlLimit = searchParameters.BuildSqlLimit();
+            if (!string.IsNullOrEmpty(sqlLimit))
+                builder.Append(sqlLimit);
+
+            //查询
+            var sql = builder.ToString();
+            if (sqlWhere.Item2 != null && sqlWhere.Item2.Any())
+                return _connection.Query<TEntity>(sql, sqlWhere.Item2);
+            return _connection.Query<TEntity>(sql);
         }
     }
 }

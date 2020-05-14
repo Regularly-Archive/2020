@@ -32,5 +32,7 @@ namespace Auditing.Infrastructure.Repository
         IEnumerable<TEntity> GetByQuery<TEntity>(string sql, object param) where TEntity : class;
 
         IEnumerable<TEntity> GetAll<TEntity>() where TEntity : class;
+
+        IEnumerable<TEntity> GetByQuery<TEntity>(SearchParameters searchParameters) where TEntity : class;
     }
 }

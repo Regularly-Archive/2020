@@ -45,6 +45,38 @@ namespace Auditing.Api.Controllers
             return item;
         }
 
+        [HttpGet]
+        [Route("[action]")]
+        public IEnumerable<BusinessUnit> Query()
+        {
+            var searchParameters = new SearchParameters();
+            searchParameters.PageInfo = new PageInfo() { PageSize = 10, CurrentPage = 1 };
+            searchParameters.ConditionItems = new List<Condition>();
+            searchParameters.ConditionItems.Add(new Condition()
+            {
+                Field = "OrgCode",
+                Op = Operator.Contains,
+                Value = "飞天御剑流",
+                OrGroup = "OrgCode"
+
+            });
+            searchParameters.ConditionItems.Add(new Condition()
+            {
+                Field = "OrgCode",
+                Op = Operator.Equals,
+                Value = "新选组",
+                OrGroup = "OrgCode"
+            });
+            searchParameters.ConditionItems.Add(new Condition()
+            {
+                Field = "CreatedAt",
+                Op = Operator.GreaterThenOrEquals,
+                Value = new DateTime(2020,1,1)
+            });
+
+            return _repository.GetByQuery<BusinessUnit>(searchParameters);
+        }
+
         [HttpPut]
         public BusinessUnit Put(BusinessUnit item)
         {

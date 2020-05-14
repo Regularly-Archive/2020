@@ -17,15 +17,17 @@ namespace Auditing.Infrastructure.Interceptors
         public void Intercept(IInvocation invocation)
         {
             var repository = invocation.Proxy as IRepository;
-            var entityType = GetEntityType(invocation);
-            var tableName = GetTableName(entityType);
-            var tableIdProperty = entityType.GetProperty("Id");
             var auditLogAttrs = invocation.Method.GetCustomAttributes(typeof(AuditLogAttribute), false);
-            if (auditLogAttrs == null || auditLogAttrs.Length == 0 || entityType == typeof(AuditLog))
+            if (auditLogAttrs == null || auditLogAttrs.Length == 0)
             {
                 invocation.Proceed();
                 return;
             }
+
+            var entityType = GetEntityType(invocation);
+            var tableName = GetTableName(entityType);
+            var tableIdProperty = entityType.GetProperty("Id");
+
 
             var auditLogAttr = (auditLogAttrs as AuditLogAttribute[])[0];
             var auditLogs = new List<AuditLog>();
