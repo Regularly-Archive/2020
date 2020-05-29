@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Reflection.Emit;
 
 namespace Auditing.Infrastructure.Repository
 {
@@ -18,7 +19,16 @@ namespace Auditing.Infrastructure.Repository
 
     public class QueryModel : List<Condition>
     {
+        public void Add<T>(Condition<T> condition) where T : class
+        {
+            var filedName = string.Empty;
+            var memberExp = condition.Field.Body as MemberExpression;
+            if (memberExp == null)
+                throw new Exception("$Argument \"expression\" must be a MemberExpression");
+            filedName = memberExp.Member.Name;
 
+            Add(new Condition() { Field = filedName, Op = condition.Op, Value = condition.Value, OrGroup = condition.OrGroup });
+        }
     }
 
     public class PageModel
@@ -54,6 +64,14 @@ namespace Auditing.Infrastructure.Repository
     public class Condition
     {
         public string Field { get; set; }
+        public Operation Op { get; set; }
+        public object Value { get; set; }
+        public string OrGroup { get; set; }
+    }
+
+    public class Condition<T> : Condition
+    {
+        public new Expression<Func<T, dynamic>> Field { get; set; }
         public Operation Op { get; set; }
         public object Value { get; set; }
         public string OrGroup { get; set; }

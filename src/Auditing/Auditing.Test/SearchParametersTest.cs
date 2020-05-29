@@ -3,6 +3,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Auditing.Test
 {
@@ -88,8 +89,8 @@ namespace Auditing.Test
             var searchParameters = new SearchParameters();
             searchParameters.Query = new QueryModel();
             searchParameters.Query.Add(new Condition() { Field = "IntValue", Op = Operation.LessThan, Value = 30 });
-            searchParameters.Query.Add(new Condition() { Field = "StringValue", Op = Operation.Contains, Value = "山", OrGroup = "StringValue"});
-            searchParameters.Query.Add(new Condition() { Field = "StringValue", Op = Operation.Contains, Value = "有朋", OrGroup = "StringValue" });
+            searchParameters.Query.Add(new Condition() { Field = "StringValue", Op = Operation.Contains, Value = "山", OrGroup = "StringValue" });
+            searchParameters.Query.Add(new Condition<Foo>() { Field = x => x.StringValue, Op = Operation.Contains, Value = "有朋", OrGroup = "StringValue" });
             var lambda = LambdaExpressionBuilder.BuildLambda<Foo>(searchParameters.Query);
             var where = lambda.Compile();
             var result = _fooList.Where(where);
