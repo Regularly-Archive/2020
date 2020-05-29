@@ -19,7 +19,8 @@ namespace Auditing.Infrastructure.Repository
             var propertyInfo = propertyParam.Member as PropertyInfo;
             if (propertyInfo == null) throw new ArgumentException($"Invalid field \"{condition.Field}\"");
             var realPropertyType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
-            condition.Value = Convert.ChangeType(condition.Value, realPropertyType);
+            if (condition.Op != Operation.StdIn && condition.Op != Operation.StdNotIn)
+                condition.Value = Convert.ChangeType(condition.Value, realPropertyType);
             var constantParam = Expression.Constant(condition.Value);
             switch (condition.Op)
             {
@@ -44,10 +45,9 @@ namespace Auditing.Infrastructure.Repository
                 case Operation.LessThanOrEquals:
                     return Expression.LessThanOrEqual(propertyParam, constantParam);
                 case Operation.StdIn:
-                    return Expression.Call(null, typeof(Enumerable).GetMethod("Contains"), new Expression[] { constantParam, propertyParam });
-
+                    return Expression.Call(typeof(Enumerable), "Contains",new Type[] { realPropertyType }, new Expression[] { constantParam, propertyParam });
                 case Operation.StdNotIn:
-                    return Expression.Not(Expression.Call(null, typeof(Enumerable).GetMethod("Contains"), new Expression[] { constantParam, propertyParam }));
+                    return Expression.Not(Expression.Call(typeof(Enumerable), "Contains", new Type[] { realPropertyType }, new Expression[] { constantParam, propertyParam }));
             }
 
             return null;
@@ -73,12 +73,12 @@ namespace Auditing.Infrastructure.Repository
             var parameter = Expression.Parameter(typeof(T), "x");
 
             //简单条件
-            var simpleExps = conditions.FindAll(c => string.IsNullOrEmpty(c.OrGroup))
+            var simpleExps = conditions.ToList().FindAll(c => string.IsNullOrEmpty(c.OrGroup))
                 .Select(c => GetExpression(parameter, c))
                 .ToList();
 
             //复杂条件
-            var complexExps = conditions.FindAll(c => !string.IsNullOrEmpty(c.OrGroup))
+            var complexExps = conditions.ToList().FindAll(c => !string.IsNullOrEmpty(c.OrGroup))
                 .GroupBy(x => x.OrGroup)
                 .Select(g => GetGroupExpression(parameter, g.ToList()))
                 .ToList();
