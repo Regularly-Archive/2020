@@ -17,8 +17,8 @@ namespace Auditing.Infrastructure.Interceptors
         public void Intercept(IInvocation invocation)
         {
             var repository = invocation.Proxy as IRepository;
-            var auditLogAttrs = invocation.Method.GetCustomAttributes(typeof(AuditLogAttribute), false);
-            if (auditLogAttrs == null || auditLogAttrs.Length == 0)
+            var auditLogAttr = invocation.Method.GetCustomAttribute<AuditLogAttribute>();
+            if (auditLogAttr == null)
             {
                 invocation.Proceed();
                 return;
@@ -29,7 +29,6 @@ namespace Auditing.Infrastructure.Interceptors
             var tableIdProperty = entityType.GetProperty("Id");
 
 
-            var auditLogAttr = (auditLogAttrs as AuditLogAttribute[])[0];
             var auditLogs = new List<AuditLog>();
             switch (auditLogAttr.OperationType)
             {

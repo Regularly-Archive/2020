@@ -6,15 +6,22 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using MongoDB.Driver;
 
 namespace RESTMongo
 {
     public static class RestMongoExtension
     {
-        public static IEndpointConventionBuilder MapRestMongo(this IEndpointRouteBuilder endpoints, IConfiguration configuration)
+        public static void MapRestMongo(this IEndpointRouteBuilder endpoints, IConfiguration configuration)
         {
-            endpoints.MapGet("/mongo/{database}/{collection}/{id}", context =>
+            var options = configuration.Get<RestMongoOptions>();
+            endpoints.MapGet(options.RoutePrefix + "/{database}/{collection}/{id}", context =>
             {
+                var database = context.Request.RouteValues["database"].ToString();
+                var collection = context.Request.RouteValues["collection"].ToString();
+                var id = context.Request.RouteValues["id"].ToString();
+                var repository = new RepositoryBase(options.ConnectionString, database);
+                var repository.GetById(collection,id)
                 return Task.CompletedTask;
             });
 
@@ -37,6 +44,11 @@ namespace RESTMongo
             {
                 return Task.CompletedTask;
             });
+        }
+
+        public static void MapRestMongo(this IEndpointRouteBuilder endpoints, IConfiguration configuration, Action<RestMongoOptions> action)
+        {
+
         }
     }
 }

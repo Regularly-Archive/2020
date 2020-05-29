@@ -4,16 +4,24 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace Auditing.Infrastructure.Repository
 {
     public class SearchParameters
     {
-        public PageInfo PageInfo { get; set; }
-        public List<Condition> ConditionItems { get; set; }
+        public PageModel Page { get; set; }
+        public QueryModel Query { get; set; }
     }
 
-    public class PageInfo
+    public class QueryModel : List<Condition>
+    {
+
+    }
+
+    public class PageModel
     {
         public int CurrentPage { get; set; } = 1;
         public int PageSize { get; set; } = 500;
@@ -27,7 +35,7 @@ namespace Auditing.Infrastructure.Repository
         Desc = 20
     }
 
-    public enum Operator
+    public enum Operation
     {
         Equals = 10,
         NotEquals = 20,
@@ -36,7 +44,7 @@ namespace Auditing.Infrastructure.Repository
         GreaterThen = 50,
         GreaterThenOrEquals = 60,
         StdIn = 70,
-        NotStdIn = 80,
+        StdNotIn = 80,
         Contains = 90,
         NotContains = 100,
         StartsWith = 110,
@@ -46,7 +54,7 @@ namespace Auditing.Infrastructure.Repository
     public class Condition
     {
         public string Field { get; set; }
-        public Operator Op { get; set; }
+        public Operation Op { get; set; }
         public object Value { get; set; }
         public string OrGroup { get; set; }
     }
@@ -55,7 +63,7 @@ namespace Auditing.Infrastructure.Repository
     {
         public static (string, Dictionary<string, object>) BuildSqlWhere(this SearchParameters searchParameters)
         {
-            var conditions = searchParameters.ConditionItems;
+            var conditions = searchParameters.Query;
             if (conditions == null || !conditions.Any())
                 return (string.Empty, null);
 
@@ -68,15 +76,15 @@ namespace Auditing.Infrastructure.Repository
 
             //构建复杂条件
             var complexConditions = conditions.FindAll(x => !string.IsNullOrEmpty(x.OrGroup));
-            sqlExps.AddRange(complexConditions.GroupBy(x => x.OrGroup).ToList().Select(x => "( " + x.BuildSqlWhere(ref sqlParam," OR ") + " )"));
+            sqlExps.AddRange(complexConditions.GroupBy(x => x.OrGroup).ToList().Select(x => "( " + x.BuildSqlWhere(ref sqlParam, " OR ") + " )"));
 
-            var sqlWhwere = sqlExps.Count > 1 ? sqlExps.Join(" AND ") : sqlExps[0];
+            var sqlWhwere = sqlExps.Count > 1 ? string.Join(" AND ", sqlExps) : sqlExps[0];
             return ($" WHERE {sqlWhwere} ", sqlParam);
         }
 
         public static string BuildSqlOrderBy(this SearchParameters searchParameters)
         {
-            var pageInfo = searchParameters.PageInfo;
+            var pageInfo = searchParameters.Page;
             if (pageInfo.SortFields != null && pageInfo.SortFields.Any())
             {
                 var orderBy = pageInfo.SortFields.Join(",");
@@ -89,17 +97,11 @@ namespace Auditing.Infrastructure.Repository
 
         public static string BuildSqlLimit(this SearchParameters searchParameters)
         {
-            var pageInfo = searchParameters.PageInfo;
-            if (pageInfo.SortFields != null && pageInfo.SortFields.Any())
-            {
-                var skipCount = (pageInfo.CurrentPage - 1) * pageInfo.PageSize;
-                var pageSize = pageInfo.PageSize;
-                return ($" LIMIT {skipCount},{pageSize}");
-            }
-
-            return string.Empty;
+            var pageInfo = searchParameters.Page;
+            var skipCount = (pageInfo.CurrentPage - 1) * pageInfo.PageSize;
+            var pageSize = pageInfo.PageSize;
+            return ($" LIMIT {skipCount},{pageSize}");
         }
-
 
         public static string BuildSqlWhere(this IEnumerable<Condition> conditions, ref Dictionary<string, object> sqlParams, string keywords = " AND ")
         {
@@ -113,51 +115,51 @@ namespace Auditing.Infrastructure.Repository
                 var index = sqlParams.Count + sqlParamIndex;
                 switch (condition.Op)
                 {
-                    case Operator.Equals:
+                    case Operation.Equals:
                         sqlExps.Add($"{condition.Field} = @Param{index}");
                         sqlParams[$"Param{index}"] = condition.Value;
                         break;
-                    case Operator.NotEquals:
+                    case Operation.NotEquals:
                         sqlExps.Add($"{condition.Field} <> @Param{index}");
                         sqlParams[$"Param{index}"] = condition.Value;
                         break;
-                    case Operator.Contains:
+                    case Operation.Contains:
                         sqlExps.Add($"{condition.Field} LIKE @Param{index}");
                         sqlParams[$"Param{index}"] = $"%{condition.Value}%";
                         break;
-                    case Operator.NotContains:
+                    case Operation.NotContains:
                         sqlExps.Add($"{condition.Field} NOT LIKE @Param{index}");
                         sqlParams[$"Param{index}"] = $"%{condition.Value}%";
                         break;
-                    case Operator.StartsWith:
+                    case Operation.StartsWith:
                         sqlExps.Add($"{condition.Field} LIKE @Param{index}");
                         sqlParams[$"Param{index}"] = $"%{condition.Value}";
                         break;
-                    case Operator.EndsWith:
+                    case Operation.EndsWith:
                         sqlExps.Add($"{condition.Field} LIKE @Param{index}");
                         sqlParams[$"Param{index}"] = $"{condition.Value}%";
                         break;
-                    case Operator.GreaterThen:
+                    case Operation.GreaterThen:
                         sqlExps.Add($"{condition.Field} > @Param{index}");
                         sqlParams[$"Param{index}"] = $"{condition.Value}";
                         break;
-                    case Operator.GreaterThenOrEquals:
+                    case Operation.GreaterThenOrEquals:
                         sqlExps.Add($"{condition.Field} >= @Param{index}");
                         sqlParams[$"Param{index}"] = $"{condition.Value}";
                         break;
-                    case Operator.LessThan:
+                    case Operation.LessThan:
                         sqlExps.Add($"{condition.Field} < @Param{index}");
                         sqlParams[$"Param{index}"] = $"{condition.Value}";
                         break;
-                    case Operator.LessThanOrEquals:
+                    case Operation.LessThanOrEquals:
                         sqlExps.Add($"{condition.Field} <= @Param{index}");
                         sqlParams[$"Param{index}"] = $"{condition.Value}";
                         break;
-                    case Operator.StdIn:
+                    case Operation.StdIn:
                         sqlExps.Add($"{condition.Field} IN @Param{index}");
                         sqlParams[$"Param{index}"] = $"{condition.Value}";
                         break;
-                    case Operator.NotStdIn:
+                    case Operation.StdNotIn:
                         sqlExps.Add($"{condition.Field} NOT IN @Param{index}");
                         sqlParams[$"Param{index}"] = $"{condition.Value}";
                         break;
@@ -166,8 +168,13 @@ namespace Auditing.Infrastructure.Repository
                 sqlParamIndex += 1;
             }
 
-            return sqlExps.Count > 1 ? sqlExps.Join(keywords) : sqlExps[0];
+            return sqlExps.Count > 1 ? string.Join(keywords, sqlExps) : sqlExps[0];
         }
 
+        public static Func<T, bool> BuildWhere<T>(this IEnumerable<Condition> conditions)
+        {
+            var lambda = LambdaExpressionBuilder.BuildLambda<T>(conditions);
+            return lambda.Compile();
+        }
     }
 }

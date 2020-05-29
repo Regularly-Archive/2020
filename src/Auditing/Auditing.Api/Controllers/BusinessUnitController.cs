@@ -50,27 +50,27 @@ namespace Auditing.Api.Controllers
         public IEnumerable<BusinessUnit> Query()
         {
             var searchParameters = new SearchParameters();
-            searchParameters.PageInfo = new PageInfo() { PageSize = 10, CurrentPage = 1 };
-            searchParameters.ConditionItems = new List<Condition>();
-            searchParameters.ConditionItems.Add(new Condition()
+            searchParameters.Page = new PageModel() { PageSize = 10, CurrentPage = 1 };
+            searchParameters.Query = new QueryModel();
+            searchParameters.Query.Add(new Condition()
             {
                 Field = "OrgCode",
-                Op = Operator.Contains,
+                Op = Operation.Contains,
                 Value = "飞天御剑流",
                 OrGroup = "OrgCode"
 
             });
-            searchParameters.ConditionItems.Add(new Condition()
+            searchParameters.Query.Add(new Condition()
             {
                 Field = "OrgCode",
-                Op = Operator.Equals,
+                Op = Operation.Equals,
                 Value = "新选组",
                 OrGroup = "OrgCode"
             });
-            searchParameters.ConditionItems.Add(new Condition()
+            searchParameters.Query.Add(new Condition()
             {
                 Field = "CreatedAt",
-                Op = Operator.GreaterThenOrEquals,
+                Op = Operation.GreaterThenOrEquals,
                 Value = new DateTime(2020,1,1)
             });
 
