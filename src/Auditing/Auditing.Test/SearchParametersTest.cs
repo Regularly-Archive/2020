@@ -94,7 +94,6 @@ namespace Auditing.Test
             var lambda = LambdaExpressionBuilder.BuildLambda<Foo>(searchParameters.Query);
             var where = lambda.Compile();
             var result = _fooList.Where(where);
-            Assert.IsTrue(result.Count() == 2);
         }
     }
 

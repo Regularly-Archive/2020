@@ -24,9 +24,11 @@ namespace Auditing.Infrastructure.Repository
             var filedName = string.Empty;
             var memberExp = condition.Field.Body as MemberExpression;
             if (memberExp == null)
-                throw new Exception("$Argument \"expression\" must be a MemberExpression");
+            {
+                var ubody = (UnaryExpression)condition.Field.Body;
+                memberExp = ubody.Operand as MemberExpression;
+            }
             filedName = memberExp.Member.Name;
-
             Add(new Condition() { Field = filedName, Op = condition.Op, Value = condition.Value, OrGroup = condition.OrGroup });
         }
     }
