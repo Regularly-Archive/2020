@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Linq.Expressions;
 
 namespace Auditing.Test
 {
@@ -95,6 +96,21 @@ namespace Auditing.Test
             var where = lambda.Compile();
             var result = _fooList.Where(where);
         }
+
+        [Test]
+        public void BuildExpression_Test()
+        {
+            //x
+            var parameter = Expression.Parameter(typeof(tt_wg_order), "x");
+            //x.STATUS == 10
+            var condStatus = Expression.Equal(Expression.Property(parameter, "STATUS"), Expression.Constant(10));
+            //x.Isdelete == 0
+            var condIsDelete = Expression.Equal(Expression.Property(parameter, "Isdelete"), Expression.Constant(0));
+            //x.STATUS == 10 && x.Isdelete == 0
+            var condAndAlso = Expression.AndAlso(condStatus, condIsDelete);
+            //x => x.STATUS == 10 && x.Isdelete == 0
+            var lambda = Expression.Lambda<Func<tt_wg_order,bool>>(condAndAlso, parameter);
+        }
     }
 
     class Foo
@@ -104,5 +120,11 @@ namespace Auditing.Test
 
         public DateTime? NullableDateTimeValue { get; set; }
         public string StringValue { get; set; }
+    }
+
+    class tt_wg_order
+    {
+        public int STATUS { get; set; }
+        public int Isdelete { get; set; }
     }
 }

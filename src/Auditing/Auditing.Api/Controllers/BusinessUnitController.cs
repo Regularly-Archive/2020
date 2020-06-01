@@ -52,27 +52,9 @@ namespace Auditing.Api.Controllers
             var searchParameters = new SearchParameters();
             searchParameters.Page = new PageModel() { PageSize = 10, CurrentPage = 1 };
             searchParameters.Query = new QueryModel();
-            searchParameters.Query.Add(new Condition()
-            {
-                Field = "OrgCode",
-                Op = Operation.Contains,
-                Value = "飞天御剑流",
-                OrGroup = "OrgCode"
-
-            });
-            searchParameters.Query.Add(new Condition()
-            {
-                Field = "OrgCode",
-                Op = Operation.Equals,
-                Value = "新选组",
-                OrGroup = "OrgCode"
-            });
-            searchParameters.Query.Add(new Condition()
-            {
-                Field = "CreatedAt",
-                Op = Operation.GreaterThenOrEquals,
-                Value = new DateTime(2020,1,1)
-            });
+            searchParameters.Query.Add(new Condition(){Field = "OrgCode",Op = Operation.Contains,Value = "飞天御剑流",OrGroup = "OrgCode"});
+            searchParameters.Query.Add(new Condition(){Field = "OrgCode",Op = Operation.Equals,Value = "新选组",OrGroup = "OrgCode"});
+            searchParameters.Query.Add(new Condition(){Field = "CreatedAt",Op = Operation.GreaterThenOrEquals,Value = new DateTime(2020,1,1)});
 
             return _repository.GetByQuery<BusinessUnit>(searchParameters);
         }

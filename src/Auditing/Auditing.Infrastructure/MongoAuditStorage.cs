@@ -9,7 +9,7 @@ namespace Auditing.Infrastructure
     {
         public void SaveAuditLogs(params AuditLog[] auditLogs)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("这是由Mongodb的实现的IAuditStorage");
         }
     }
 }

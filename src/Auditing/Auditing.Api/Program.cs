@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Auditing.Infrastructure.Ioc;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,7 +24,7 @@ namespace Auditing.Api
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory());
+                .UseServiceProviderFactory(new AutowriedServiceProviderFactory());
 
     }
 }
