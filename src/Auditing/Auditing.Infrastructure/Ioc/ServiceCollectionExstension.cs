@@ -26,11 +26,5 @@ namespace Auditing.Infrastructure.Ioc
             var builder = new NamedServiceProviderBuilder(services);
             return builder;
         }
-
-        public static void EnableAutowried(this IServiceCollection services)
-        {
-            
-            services.Replace(new ServiceDescriptor(typeof(IServiceProvider), sp => new AutowiredServiceProvider(sp), ServiceLifetime.Singleton));
-        }
     }
 }

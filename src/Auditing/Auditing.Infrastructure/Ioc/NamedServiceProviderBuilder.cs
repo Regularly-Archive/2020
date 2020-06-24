@@ -21,48 +21,6 @@ namespace Auditing.Infrastructure.Ioc
             _services.AddTransient<INamedServiceProvider>(sp => new NamedServiceProvider(sp, _registrations));
         }
 
-        public INamedServiceProviderBuilder AddNamedService<TService, TImplementation>(string serviceName, ServiceLifetime lifetime) 
-            where TService : class
-            where TImplementation : class, TService
-        {
-            switch(lifetime)
-            {
-                case ServiceLifetime.Transient:
-                    _services.AddTransient<TService, TImplementation>();
-                    break;
-                case ServiceLifetime.Scoped:
-                    _services.AddScoped<TService, TImplementation>();
-                    break;
-                case ServiceLifetime.Singleton:
-                    _services.AddSingleton<TService, TImplementation>();
-                    break;
-            }
-
-            _registrations.Add(serviceName, typeof(TImplementation));
-            return this;
-        }
-
-        public INamedServiceProviderBuilder TryAddNamedService<TService, TImplementation>(string serviceName, ServiceLifetime lifetime)
-            where TService : class
-            where TImplementation : class, TService
-        {
-            switch (lifetime)
-            {
-                case ServiceLifetime.Transient:
-                    _services.TryAddTransient<TService, TImplementation>();
-                    break;
-                case ServiceLifetime.Scoped:
-                    _services.TryAddScoped<TService, TImplementation>();
-                    break;
-                case ServiceLifetime.Singleton:
-                    _services.TryAddSingleton<TService, TImplementation>();
-                    break;
-            }
-
-            _registrations.TryAdd(serviceName, typeof(TImplementation));
-            return this;
-        }
-
         public INamedServiceProviderBuilder AddNamedService<TImplementation>(string serviceName, ServiceLifetime lifetime) where TImplementation : class
         {
             switch (lifetime)
@@ -79,6 +37,25 @@ namespace Auditing.Infrastructure.Ioc
             }
 
             _registrations.Add(serviceName, typeof(TImplementation));
+            return this;
+        }
+
+        public INamedServiceProviderBuilder TryAddNamedService<TImplementation>(string serviceName, ServiceLifetime lifetime) where TImplementation : class
+        {
+            switch (lifetime)
+            {
+                case ServiceLifetime.Transient:
+                    _services.TryAddTransient<TImplementation>();
+                    break;
+                case ServiceLifetime.Scoped:
+                    _services.TryAddScoped<TImplementation>();
+                    break;
+                case ServiceLifetime.Singleton:
+                    _services.TryAddSingleton<TImplementation>();
+                    break;
+            }
+
+            _registrations.TryAdd(serviceName, typeof(TImplementation));
             return this;
         }
     }

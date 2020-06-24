@@ -16,7 +16,9 @@ namespace Auditing.Infrastructure.Ioc
                 throw new ArgumentNullException(nameof(ControllerContext));
 
             var controllerType = context.ActionDescriptor.ControllerTypeInfo.AsType();
-            var serviceProvider = new AutowiredServiceProvider(context.HttpContext.RequestServices);
+            var serviceProvider = context.HttpContext.RequestServices;
+            if(!(serviceProvider is AutowiredServiceProvider))
+                serviceProvider = new AutowiredServiceProvider(context.HttpContext.RequestServices);
             var controller = serviceProvider.GetRequiredService(controllerType);
             return controller;
         }
@@ -31,48 +33,6 @@ namespace Auditing.Infrastructure.Ioc
             var disposeable = controller as IDisposable;
             if (disposeable != null)
                 disposeable.Dispose();
-        }
-
-        private void Autowried(IServiceProvider serviceProvider, object instance)
-        {
-            if (serviceProvider == null || instance == null)
-                return;
-
-            var flags = BindingFlags.Public | BindingFlags.NonPublic;
-            var type = instance as Type ?? instance.GetType();
-            if (instance is Type)
-            {
-                instance = null;
-                flags |= BindingFlags.Static;
-            }
-            else
-            {
-                flags |= BindingFlags.Instance;
-            }
-
-            //Feild
-            foreach (var field in type.GetFields(flags))
-            {
-                var autowriedAttr = field.GetCustomAttribute<AutowiredAttribute>();
-                if (autowriedAttr != null)
-                {
-                    var dependency = serviceProvider.GetRequiredService(field.FieldType);
-                    if (dependency != null)
-                        field.SetValue(instance, dependency);
-                }
-            }
-
-            //Property
-            foreach (var property in type.GetProperties(flags))
-            {
-                var autowriedAttr = property.GetCustomAttribute<AutowiredAttribute>();
-                if (autowriedAttr != null)
-                {
-                    var dependency = serviceProvider.GetRequiredService(property.PropertyType);
-                    if (dependency != null)
-                        property.SetValue(instance, dependency);
-                }
-            }
         }
     }
 }
