@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Auditing.Infrastructure.Ioc
 {
-    public class AutowiredServiceProvider : IServiceProvider
+    public class AutowiredServiceProvider : IServiceProvider,ISupportRequiredService
     {
         private readonly IServiceProvider _serviceProvider;
         public AutowiredServiceProvider(IServiceProvider serviceProvider)
@@ -14,16 +14,21 @@ namespace Auditing.Infrastructure.Ioc
             _serviceProvider = serviceProvider;
         }
 
+        public object GetRequiredService(Type serviceType)
+        {
+            return GetService(serviceType);
+        }
+
         public object GetService(Type serviceType)
         {
             var instance = _serviceProvider.GetService(serviceType);
-            Autowried(_serviceProvider, instance);
+            Autowried(instance);
             return instance;
         }
 
-        private void Autowried(IServiceProvider serviceProvider, object instance)
+        private void Autowried(object instance)
         {
-            if (serviceProvider == null || instance == null)
+            if (_serviceProvider == null || instance == null)
                 return;
 
             var flags = BindingFlags.Public | BindingFlags.NonPublic;
@@ -41,10 +46,10 @@ namespace Auditing.Infrastructure.Ioc
             //Feild
             foreach (var field in type.GetFields(flags))
             {
-                var autowriedAttr = field.GetCustomAttribute<AutowriedAttribute>();
+                var autowriedAttr = field.GetCustomAttribute<AutowiredAttribute>();
                 if (autowriedAttr != null)
                 {
-                    var dependency = ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, field.FieldType);
+                    var dependency = GetService(field.FieldType);
                     if (dependency != null)
                         field.SetValue(instance, dependency);
                 }
@@ -53,10 +58,10 @@ namespace Auditing.Infrastructure.Ioc
             //Property
             foreach (var property in type.GetProperties(flags))
             {
-                var autowriedAttr = property.GetCustomAttribute<AutowriedAttribute>();
+                var autowriedAttr = property.GetCustomAttribute<AutowiredAttribute>();
                 if (autowriedAttr != null)
                 {
-                    var dependency = ActivatorUtilities.GetServiceOrCreateInstance(serviceProvider, property.PropertyType);
+                    var dependency = GetService(property.PropertyType);
                     if (dependency != null)
                         property.SetValue(instance, dependency);
                 }

@@ -10,6 +10,7 @@ using Auditing.Infrastructure.Ioc;
 using Auditing.Infrastructure.Repository;
 using Auditing.Infrastructure.Services;
 using Autofac;
+using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Autofac.Extras.DynamicProxy;
 using Microsoft.AspNetCore.Builder;
@@ -56,13 +57,34 @@ namespace Auditing.Api
                 .AsNamedServiceProvider()
                 .AddNamedService<MongoAuditStorage>("MongoAuditStorage", ServiceLifetime.Transient)
                 .AddNamedService<FileAuditStorage>("FileAuditStorage", ServiceLifetime.Transient)
+                .AddNamedService<ChineseSayHello>("Chinese", ServiceLifetime.Transient)
+                .AddNamedService<EnglishSayHello>("English", ServiceLifetime.Transient)
                 .Build();
-            services.AddTransient<IFooService, FooService>();
+            services.AddTransient<IFooService,FooService>();
             services.AddTransient<IBarService, BarService>();
+            services.AddTransient<BarService>();
             services.AddControllers();
             services.AddControllersWithViews().AddControllersAsServices();
-            services.Replace(ServiceDescriptor.Transient<IControllerActivator, ServiceBasedControllerActivator>());
-            services.EnableAutowried();
+            services.Replace(ServiceDescriptor.Transient<IControllerActivator, AutowiredControllerActivator>());
+            services.AddTransient<ChineseSayHello>();
+            services.AddTransient<EnglishSayHello>();
+            services.AddTransient(implementationFactory =>
+            {
+                Func<string, ISayHello> sayHelloFactory = lang =>
+                 {
+                     switch (lang)
+                     {
+                         case "Chinese":
+                             return implementationFactory.GetService<ChineseSayHello>();
+                         case "English":
+                             return implementationFactory.GetService<EnglishSayHello>();
+                         default:
+                             throw new NotImplementedException();
+                     }
+                 };
+
+                return sayHelloFactory;
+            });
         }
 
 

@@ -133,3 +133,6 @@ D:\Projects\2020\src\Auditing\Auditing.Api\bin\Debug\netcoreapp3.1\zh-Hans\Micro
 D:\Projects\2020\src\Auditing\Auditing.Api\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
 D:\Projects\2020\src\Auditing\Auditing.Api\obj\Debug\netcoreapp3.1\Auditing.Api.csproj.CoreCompileInputs.cache
 D:\Projects\2020\src\Auditing\Auditing.Api\obj\Debug\netcoreapp3.1\Auditing.Api.MvcApplicationPartsAssemblyInfo.cache
+D:\Projects\2020\src\Auditing\Auditing.Api\bin\Debug\netcoreapp3.1\Microsoft.DotNet.PlatformAbstractions.dll
+D:\Projects\2020\src\Auditing\Auditing.Api\bin\Debug\netcoreapp3.1\Microsoft.Extensions.DependencyModel.dll
+D:\Projects\2020\src\Auditing\Auditing.Api\obj\Debug\netcoreapp3.1\Auditing.Api.MvcApplicationPartsAssemblyInfo.cs

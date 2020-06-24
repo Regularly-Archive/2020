@@ -7,7 +7,7 @@ namespace Auditing.Infrastructure.Services
 {
     public class FooService : IFooService
     {
-        [Autowried]
+        [Autowired]
         public IBarService Bar { get; set; }
 
         public string Foo()
@@ -19,5 +19,6 @@ namespace Auditing.Infrastructure.Services
     public interface IFooService
     {
         string Foo();
+        IBarService Bar { get; set; }
     }
 }

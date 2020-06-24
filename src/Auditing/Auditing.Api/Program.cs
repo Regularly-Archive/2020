@@ -24,7 +24,7 @@ namespace Auditing.Api
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .UseServiceProviderFactory(new AutowriedServiceProviderFactory());
+                .UseServiceProviderFactory(new AutowiredServiceProviderFactory());
 
     }
 }

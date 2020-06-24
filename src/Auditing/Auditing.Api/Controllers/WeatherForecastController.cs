@@ -6,6 +6,8 @@ using Auditing.Infrastructure;
 using Auditing.Infrastructure.Ioc;
 using Auditing.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Auditing.Api.Controllers
@@ -21,6 +23,10 @@ namespace Auditing.Api.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly IServiceProvider _serviceProvider;
+
+        [Autowired]
+        public IFooService Foo { get; set; }
+
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger, IServiceProvider serviceProvider)
         {
@@ -56,12 +62,18 @@ namespace Auditing.Api.Controllers
 
 
         [HttpGet]
-        [Route("Autowried")]
+        [Route("Autowired")]
         public ActionResult GetAutowriedService()
         {
-            var _fooService = _serviceProvider.GetService(typeof(IFooService));
-            return Ok();
+            return Content($"{Foo.Foo()} , {Foo.Bar.Bar()}");
         }
 
+        [HttpGet]
+        [Route("SayHello")]
+        public ActionResult SayHello(string lang, string receiver)
+        {
+            var sayHello = _serviceProvider.GetNamedService<ISayHello>(lang);
+            return Content(sayHello.SayHello(receiver));
+        }
     }
 }

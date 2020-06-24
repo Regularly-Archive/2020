@@ -5,7 +5,7 @@ using System.Text;
 namespace Auditing.Infrastructure.Ioc
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class AutowriedAttribute : Attribute
+    public class AutowiredAttribute : Attribute
     {
 
     }
