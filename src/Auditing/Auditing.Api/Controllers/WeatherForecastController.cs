@@ -21,16 +21,16 @@ namespace Auditing.Api.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private readonly ILogger<WeatherForecastController> _logger;
         private readonly IServiceProvider _serviceProvider;
 
         [Autowired]
         public IFooService Foo { get; set; }
 
+        [Autowired]
+        public ILogger<WeatherForecastController> Logger { get; set; }
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IServiceProvider serviceProvider)
+        public WeatherForecastController(IServiceProvider serviceProvider)
         {
-            _logger = logger;
             _serviceProvider = serviceProvider;
         }
 
