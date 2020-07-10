@@ -85,6 +85,8 @@ namespace Auditing.Api
 
                 return sayHelloFactory;
             });
+
+            services.AddTransient(implementationFactory => new AutowiredServiceProvider(implementationFactory));
         }
 
 

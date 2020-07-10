@@ -8,25 +8,25 @@ using System.Threading.Tasks;
 
 namespace RESTMongo
 {
-    public class RepositoryBase
+    public class MongoRepository
     {
         /// <summary>
         /// IMongoDatabase
         /// </summary>
         private readonly IMongoDatabase database;
 
-        public RepositoryBase(string connectionString, string database)
+        public MongoRepository(string connectionString, string database)
         {
             var client = new MongoClient(connectionString);
             this.database = client.GetDatabase(database);
         }
 
-        public RepositoryBase(IMongoClient client, string database)
+        public MongoRepository(IMongoClient client, string database)
         {
             this.database = client.GetDatabase(database);
         }
 
-        public RepositoryBase(IMongoDatabase database)
+        public MongoRepository(IMongoDatabase database)
         {
             this.database = database;
         }

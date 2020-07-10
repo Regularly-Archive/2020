@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace RESTMongo
 {
@@ -14,13 +15,18 @@ namespace RESTMongo
     {
         public static void MapRestMongo(this IEndpointRouteBuilder endpoints, IConfiguration configuration)
         {
-            var options = configuration.Get<RestMongoOptions>();
-            endpoints.MapGet(options.RoutePrefix + "/{database}/{collection}/{id}", context =>
+            var mongoOptions = configuration.Get<RestMongoOptions>();
+            var mongoRepository = 
+            endpoints.Map(mongoOptions.RoutePrefix, context =>
+            {
+                var mongoRepository =context.RequestServices.GetRequiredService<MON>
+            });
+            endpoints.MapGet(mongoOptions.RoutePrefix + "/{database}/{collection}/{id}", context =>
             {
                 var database = context.Request.RouteValues["database"].ToString();
                 var collection = context.Request.RouteValues["collection"].ToString();
                 var id = context.Request.RouteValues["id"].ToString();
-                var repository = new RepositoryBase(options.ConnectionString, database);
+                var repository = new MongoRepository(mongoOptions.ConnectionString, database);
                 var repository.GetById(collection,id)
                 return Task.CompletedTask;
             });

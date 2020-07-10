@@ -65,6 +65,8 @@ namespace Auditing.Api.Controllers
         [Route("Autowired")]
         public ActionResult GetAutowriedService()
         {
+            var serviceProvider = new AutowiredServiceProvider(_serviceProvider);
+            serviceProvider.GetRequiredService<IFooService>().Bar.Bar();
             return Content($"{Foo.Foo()} , {Foo.Bar.Bar()}");
         }
 

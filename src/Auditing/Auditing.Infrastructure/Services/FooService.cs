@@ -10,10 +10,7 @@ namespace Auditing.Infrastructure.Services
         [Autowired]
         public IBarService Bar { get; set; }
 
-        public string Foo()
-        {
-            return "I am foo";
-        }
+        public string Foo() => "I am Foo";
     }
 
     public interface IFooService

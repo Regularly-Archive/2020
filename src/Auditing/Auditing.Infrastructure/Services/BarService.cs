@@ -6,10 +6,7 @@ namespace Auditing.Infrastructure.Services
 {
     public class BarService : IBarService
     {
-        public string Bar()
-        {
-            return "I am Bar";
-        }
+        public string Bar() => "I am Bar";
     }
 
     public interface IBarService
