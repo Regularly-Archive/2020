@@ -29,8 +29,10 @@ namespace BinLogConsumer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IRabbitMQPersistentConnection, DefaultRabbitMQPersistentConnection>();
+            services.AddSingleton<IEventBusSubscriptionManager, EventBusSubscriptionManager>(sp => new EventBusSubscriptionManager());
             services.AddSingleton<IConnectionFactory, ConnectionFactory>(sp => new ConnectionFactory() { HostName = "localhost", UserName = "guest", Password = "guest" });
-            services.AddSingleton<IEventBus, EventBus>();
+            services.AddSingleton<IEventBus, RabbitMQEventBus>(sp => new RabbitMQEventBus(sp.GetRequiredService<IRabbitMQPersistentConnection>(), sp.GetRequiredService<IEventBusSubscriptionManager>(), sp.GetRequiredService<ILogger<RabbitMQEventBus>>(), sp, "eventbus-exchange", "eventbus-queue"));
             services.AddTransient<IEventHandler<WriteLogEvent>, WriteLogEventHandler>();
             services.AddControllers();
         }

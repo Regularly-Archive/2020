@@ -22,8 +22,10 @@ namespace BinLogConsumer.Controllers
 
         // Post: /<controller>/Publish
         [HttpPost]
+        [Route("Publish")]
         public Task Publish(WriteLogEvent @event)
         {
+            _eventBus.Subscribe<WriteLogEvent, IEventHandler<WriteLogEvent>>();
             _eventBus.Publish(@event);
             return Task.CompletedTask;
         }
