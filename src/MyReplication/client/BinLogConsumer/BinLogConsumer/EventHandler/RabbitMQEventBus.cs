@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Polly;
 using Polly.Retry;
+using Polly.Timeout;
+using Polly.Wrap;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
@@ -81,20 +84,16 @@ namespace BinLogConsumer.EventHandler
             channel.QueueDeclare(queueName, true, false, false, null);
             channel.QueueBind(queueName, _exchangeName, routingKey, null);
             var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += (s, e) =>
+            consumer.Received += async (s, e) =>
             {
-                var eventName = e.RoutingKey;
+                var routingKey = e.RoutingKey;
                 var message = Encoding.UTF8.GetString(e.Body.ToArray());
-                var policy = RetryPolicy.Handle<Exception>()
-                    .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
-                    {
-                        _logger.LogWarning(ex, "RabbitMQ Client consume message after {TimeOut}s ({ExceptionMessage})", $"{time.TotalSeconds:n1}", ex.Message);
-                    }
-                );
 
-                policy.Execute(async () => await ProcessEvent(eventName, message));
+                var tasks = ProcessEvent(routingKey, message);
+                await Task.WhenAll(tasks);
                 channel.BasicAck(e.DeliveryTag, false);
             };
+
             channel.BasicConsume(queue: $"Q:{routingKey}", autoAck: false, consumer: consumer);
         }
 
@@ -111,10 +110,11 @@ namespace BinLogConsumer.EventHandler
             return $"Q:{routingKey}";
         }
 
-        private async Task ProcessEvent(string eventName, string message)
+        private IEnumerable<Task> ProcessEvent(string eventName, string message)
         {
             if (_subscriptionManager.IsEventSubscribed(eventName))
             {
+                var policy = BuildProcessEventPolicy();
                 using (var serviceScope = _serviceProvider.CreateScope())
                 {
                     foreach (var handlerType in _subscriptionManager.GetHandlersForEvent(eventName))
@@ -126,12 +126,28 @@ namespace BinLogConsumer.EventHandler
                         var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
                         var concreteType = typeof(IEventHandler<>).MakeGenericType(eventType);
 
-                        await Task.Yield();
-                        _logger.LogInformation($"Process event \"{eventName}\" via handler \"{handler.GetType().Name}\"");
-                        await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent });
+                        _logger.LogInformation($"Process event \"{eventName}\" with \"{handler.GetType().Name}\"...");
+                        yield return (Task)policy.Execute(() => concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent }));
                     }
                 }
             }
+        }
+
+        private  PolicyWrap BuildProcessEventPolicy()
+        {
+            //重试策略
+            var retryPolicy = RetryPolicy
+                .Handle<Exception>()
+                .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
+                {
+                    _logger.LogInformation($"Process event fails due to \"{ex.InnerException?.Message}\" and  it will re-try after {time.TotalSeconds}s");
+                });
+
+            //超时策略
+            var timeoutPolicy = TimeoutPolicy.Timeout(30);
+
+            //组合策略
+            return retryPolicy.Wrap(timeoutPolicy);
         }
     }
 }

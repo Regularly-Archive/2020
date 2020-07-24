@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 using RabbitMQ.Client;
 
 namespace BinLogConsumer
@@ -32,6 +33,7 @@ namespace BinLogConsumer
             services.AddSingleton<IRabbitMQPersistentConnection, DefaultRabbitMQPersistentConnection>();
             services.AddSingleton<IEventBusSubscriptionManager, EventBusSubscriptionManager>(sp => new EventBusSubscriptionManager());
             services.AddSingleton<IConnectionFactory, ConnectionFactory>(sp => new ConnectionFactory() { HostName = "localhost", UserName = "guest", Password = "guest" });
+            services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
             services.AddSingleton<IEventBus, RabbitMQEventBus>(sp => {
                 var eventBus = new RabbitMQEventBus(sp.GetRequiredService<IRabbitMQPersistentConnection>(), sp.GetRequiredService<IEventBusSubscriptionManager>(), sp.GetRequiredService<ILogger<RabbitMQEventBus>>(), sp, "eventbus-exchange", "eventbus-queue");
                 eventBus.Subscribe<WriteLogEvent, IEventHandler<WriteLogEvent>>();
