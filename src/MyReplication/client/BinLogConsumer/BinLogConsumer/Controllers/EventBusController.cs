@@ -26,7 +26,7 @@ namespace BinLogConsumer.Controllers
         // Post: /<controller>/Publish
         [HttpPost]
         [Route("PublishBinLog")]
-        public Task PublishBinLog(BinLogEventModel<object> eventModel)
+        public Task PublishBinLog(BinLogEventModel<dynamic> eventModel)
         {
             if (eventModel.action == "insert" && eventModel.table.StartsWith("log_"))
                 _eventBus.Publish(eventModel.MapTo<WriteLogEvent>());

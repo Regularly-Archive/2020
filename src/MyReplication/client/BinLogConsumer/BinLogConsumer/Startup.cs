@@ -42,7 +42,7 @@ namespace BinLogConsumer
             });
             services.AddTransient<IEventHandler<WriteLogEvent>, WriteLogEventHandler>();
             services.AddTransient<IEventHandler<OrderInfoCreateEvent>, OrderInfoCreateHandler>();
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

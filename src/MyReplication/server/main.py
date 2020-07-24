@@ -32,7 +32,7 @@ def readBinLog():
         connection_settings=mysql_settings,
         server_id=3,
         blocking=True,
-        only_tables=['order_info','log_info','log_request'],
+        only_tables=['order_info','log_info'],
         only_events=[DeleteRowsEvent, WriteRowsEvent, UpdateRowsEvent])
 
     for binlogevent in stream:
