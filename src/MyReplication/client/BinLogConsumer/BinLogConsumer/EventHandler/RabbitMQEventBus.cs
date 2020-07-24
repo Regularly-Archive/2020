@@ -21,21 +21,17 @@ namespace BinLogConsumer.EventHandler
         private readonly IServiceProvider _serviceProvider;
         private readonly IEventBusSubscriptionManager _subscriptionManager;
         private readonly string _exchangeName; //交换器名称
-        private readonly string _queueName; //队列名称
-        private IModel _consumeChannel; //消费者Channel
         private readonly int _retryCount; //消息重试次数
 
         public RabbitMQEventBus(IRabbitMQPersistentConnection persistentConnection, IEventBusSubscriptionManager subscriptionManager, ILogger<RabbitMQEventBus> logger, IServiceProvider serviceProvider, string exchangeName, string queueName, int retryCount = 5)
         {
             _persistentConnection = persistentConnection ?? throw new ArgumentNullException(nameof(IConnectionFactory));
             _subscriptionManager = subscriptionManager ?? throw new ArgumentNullException(nameof(IEventBusSubscriptionManager));
-            _subscriptionManager.OnSubscribe += (s, e) => StartBasicConsume();
-            _subscriptionManager.OnUnsubscribe += (s, e) => { };
+            _subscriptionManager.OnSubscribe += (s, e) => StartBasicConsume(e.EvenType.FullName);
+            _subscriptionManager.OnUnsubscribe += (s, e) => UnbindQueue(e.EvenType.FullName);
             _logger = logger ?? throw new ArgumentNullException(nameof(ILogger<RabbitMQEventBus>));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(IServiceProvider));
             _exchangeName = exchangeName ?? "rabbitmq-eventbus";
-            _queueName = queueName ?? "eventbus-queue"; ;
-            _consumeChannel = CreateConsumerChannel();
             _retryCount = retryCount;
         }
 
@@ -45,9 +41,7 @@ namespace BinLogConsumer.EventHandler
             if (!_persistentConnection.IsConnected) _persistentConnection.TryConnect();
             using (var channel = _persistentConnection.CreateModel())
             {
-                channel.ExchangeDeclare(_exchangeName, "direct");
-                channel.QueueDeclare(queue: _queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
-                channel.QueueBind(_queueName, _exchangeName, "", null);
+                channel.ExchangeDeclare(_exchangeName, "direct", true, false, null);
 
                 var eventName = @event.GetType().FullName;
                 var message = JsonConvert.SerializeObject(@event);
@@ -66,7 +60,6 @@ namespace BinLogConsumer.EventHandler
             where TH : IEventHandler<T>
         {
             _subscriptionManager.Subscribe<T, TH>();
-            StartBasicConsume();
         }
 
         public void Unsubscribe<T, TH>()
@@ -76,16 +69,18 @@ namespace BinLogConsumer.EventHandler
             _subscriptionManager.Unsubscribe<T, TH>();
         }
 
-        private void StartBasicConsume()
+        private void StartBasicConsume(string routingKey)
         {
             _logger.LogTrace("Starting RabbitMQ BasicConsume...");
-            if (_consumeChannel == null)
-            {
-                _logger.LogError("StartBasicConsume can't be called on NullReference of _consumerChannel");
-                return;
-            }
 
-            var consumer = new EventingBasicConsumer(_consumeChannel);
+            if (!_persistentConnection.IsConnected) _persistentConnection.TryConnect();
+
+            var queueName = GetQueueName(routingKey);
+            var channel = _persistentConnection.CreateModel();
+            channel.ExchangeDeclare(_exchangeName, "direct", true, false, null);
+            channel.QueueDeclare(queueName, true, false, false, null);
+            channel.QueueBind(queueName, _exchangeName, routingKey, null);
+            var consumer = new EventingBasicConsumer(channel);
             consumer.Received += (s, e) =>
             {
                 var eventName = e.RoutingKey;
@@ -93,21 +88,27 @@ namespace BinLogConsumer.EventHandler
                 var policy = RetryPolicy.Handle<Exception>()
                     .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
                     {
-                        _logger.LogWarning(ex, "RabbitMQ Client consume messafe after {TimeOut}s ({ExceptionMessage})", $"{time.TotalSeconds:n1}", ex.Message);
+                        _logger.LogWarning(ex, "RabbitMQ Client consume message after {TimeOut}s ({ExceptionMessage})", $"{time.TotalSeconds:n1}", ex.Message);
                     }
                 );
 
                 policy.Execute(async () => await ProcessEvent(eventName, message));
+                channel.BasicAck(e.DeliveryTag, false);
             };
-            _consumeChannel.BasicConsume(queue: _queueName, autoAck: false, consumer: consumer);
+            channel.BasicConsume(queue: $"Q:{routingKey}", autoAck: false, consumer: consumer);
         }
 
-        private IModel CreateConsumerChannel()
+        private void UnbindQueue(string routingKey)
         {
-            _logger.LogTrace("Creating RabbitMQ Consune Channel...");
             if (!_persistentConnection.IsConnected) _persistentConnection.TryConnect();
             var channel = _persistentConnection.CreateModel();
-            return channel;
+            var queueName = GetQueueName(routingKey);
+            channel.QueueUnbind(queueName, _exchangeName, routingKey, null);
+        }
+
+        private string GetQueueName(string routingKey)
+        {
+            return $"Q:{routingKey}";
         }
 
         private async Task ProcessEvent(string eventName, string message)
@@ -126,7 +127,7 @@ namespace BinLogConsumer.EventHandler
                         var concreteType = typeof(IEventHandler<>).MakeGenericType(eventType);
 
                         await Task.Yield();
-                        _logger.LogDebug($"Process event \"{eventName}\" via handler \"{handler.GetType().Name}\"");
+                        _logger.LogInformation($"Process event \"{eventName}\" via handler \"{handler.GetType().Name}\"");
                         await (Task)concreteType.GetMethod("Handle").Invoke(handler, new object[] { integrationEvent });
                     }
                 }

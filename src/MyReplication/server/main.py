@@ -1,7 +1,9 @@
 from datetime import date
 import decimal
+from json import encoder
 import sys
 import json
+import encodings;
 import datetime
 import requests
 from pymysqlreplication import BinLogStreamReader
@@ -18,6 +20,8 @@ class ComplexEncoder(json.JSONEncoder):
             return obj.strftime('%Y-%m-%d')
         elif isinstance(obj, decimal.Decimal):
             return str(obj)
+        elif isinstance(obj, bytes):
+            return obj.decode('utf-8')  
         else:
             return json.JSONEncoder.default(self, obj)
 
@@ -28,6 +32,7 @@ def readBinLog():
         connection_settings=mysql_settings,
         server_id=3,
         blocking=True,
+        only_tables=['order_info','log_info','log_request'],
         only_events=[DeleteRowsEvent, WriteRowsEvent, UpdateRowsEvent])
 
     for binlogevent in stream:
@@ -52,14 +57,19 @@ def readBinLog():
     stream.close()
 
 def sendBinLog(event):
-    url = "http://localhost:5000/EventBus/Publish"
+    url = "https://localhost:44348/EventBus/PublishBinLog"
     headers = {
         'Content-Type': "application/json",
     }
-    payload = json.dumps(event,cls=ComplexEncoder)
-    print(payload)
-    response = session.request("POST", url, data=payload, headers=headers,verify=False)
-    print(response.status_code)
+
+    try:
+        payload = json.dumps(event,cls=ComplexEncoder)
+        print(payload)
+        response = session.request("POST", url, data=payload, headers=headers,verify=False)
+        print(response.status_code)
+        print(response.text)
+    except Exception:
+        pass
 
 if (__name__ == '__main__'):
     readBinLog();

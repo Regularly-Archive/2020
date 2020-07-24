@@ -89,7 +89,7 @@ namespace BinLogConsumer.EventHandler
                 _eventHandlers.Remove(eventName);
                 _eventTypes.RemoveAll(x => x.FullName == eventName);
             }
-            if (OnUnsubscribe != null)
+            if (OnUnsubscribe != null && !GetHandlersForEvent<T>().Any())
                 OnSubscribe(this, new EventBusSubscriptionEventArgs() { EvenType = typeof(T), HandlerType = typeof(TH) });
         }
     }

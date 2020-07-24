@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using BinLogConsumer.EventHandler;
 using BinLogConsumer.Events;
+using BinLogConsumer.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,11 +25,15 @@ namespace BinLogConsumer.Controllers
 
         // Post: /<controller>/Publish
         [HttpPost]
-        [Route("Publish")]
-        public Task Publish(WriteLogEvent @event)
+        [Route("PublishBinLog")]
+        public Task PublishBinLog(BinLogEventModel<object> eventModel)
         {
-            _eventBus.Subscribe<WriteLogEvent, IEventHandler<WriteLogEvent>>();
-            _eventBus.Publish(@event);
+            if (eventModel.action == "insert" && eventModel.table.StartsWith("log_"))
+                _eventBus.Publish(eventModel.MapTo<WriteLogEvent>());
+
+            if (eventModel.action == "insert" && eventModel.table == "order_info")
+                _eventBus.Publish(eventModel.MapTo<OrderInfoCreateEvent>());
+
             return Task.CompletedTask;
         }
     }

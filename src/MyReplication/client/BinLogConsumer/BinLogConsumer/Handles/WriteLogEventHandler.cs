@@ -19,7 +19,7 @@ namespace BinLogConsumer.Handles
 
         public Task Handle(WriteLogEvent @event)
         {
-            _logger.LogInformation($"当前消费消息:{@event.TRANSACTION_ID}-{@event.LOG_LEVEL}-{@event.HOST_NAME}-${@event.HOST_IP}-${@event.CONTENT}");
+            _logger.LogInformation($"日志编号：{@event.TRANSACTION_ID}，日志级别：{@event.LOG_LEVEL}，主机：{@event.HOST_NAME}，IP：{@event.HOST_IP}，内容：{@event.CONTENT}");
             return Task.CompletedTask;
         }
     }

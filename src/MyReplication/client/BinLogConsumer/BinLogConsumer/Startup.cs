@@ -32,8 +32,14 @@ namespace BinLogConsumer
             services.AddSingleton<IRabbitMQPersistentConnection, DefaultRabbitMQPersistentConnection>();
             services.AddSingleton<IEventBusSubscriptionManager, EventBusSubscriptionManager>(sp => new EventBusSubscriptionManager());
             services.AddSingleton<IConnectionFactory, ConnectionFactory>(sp => new ConnectionFactory() { HostName = "localhost", UserName = "guest", Password = "guest" });
-            services.AddSingleton<IEventBus, RabbitMQEventBus>(sp => new RabbitMQEventBus(sp.GetRequiredService<IRabbitMQPersistentConnection>(), sp.GetRequiredService<IEventBusSubscriptionManager>(), sp.GetRequiredService<ILogger<RabbitMQEventBus>>(), sp, "eventbus-exchange", "eventbus-queue"));
+            services.AddSingleton<IEventBus, RabbitMQEventBus>(sp => {
+                var eventBus = new RabbitMQEventBus(sp.GetRequiredService<IRabbitMQPersistentConnection>(), sp.GetRequiredService<IEventBusSubscriptionManager>(), sp.GetRequiredService<ILogger<RabbitMQEventBus>>(), sp, "eventbus-exchange", "eventbus-queue");
+                eventBus.Subscribe<WriteLogEvent, IEventHandler<WriteLogEvent>>();
+                eventBus.Subscribe<OrderInfoCreateEvent, IEventHandler<OrderInfoCreateEvent>>();
+                return eventBus;
+            });
             services.AddTransient<IEventHandler<WriteLogEvent>, WriteLogEventHandler>();
+            services.AddTransient<IEventHandler<OrderInfoCreateEvent>, OrderInfoCreateHandler>();
             services.AddControllers();
         }
 

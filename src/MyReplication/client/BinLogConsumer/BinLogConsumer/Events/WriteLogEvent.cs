@@ -16,7 +16,8 @@ namespace BinLogConsumer.Events
         public string CONTENT { get; set; }
         public string USER_ID { get; set; }
         public string TTID { get; set; }
-        public DateTime? CREATED_DATE { get; set; }
+        //public DateTime? CREATED_DATE { get; set; }
+        //public DateTime? CREATED_DATE { get; set; }
         public string APP_NAMESPACE { get; set; }
     }
 }
