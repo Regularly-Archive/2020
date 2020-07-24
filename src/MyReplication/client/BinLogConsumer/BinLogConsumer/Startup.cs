@@ -37,12 +37,20 @@ namespace BinLogConsumer
             services.AddSingleton<IEventBus, RabbitMQEventBus>(sp => {
                 var eventBus = new RabbitMQEventBus(sp.GetRequiredService<IRabbitMQPersistentConnection>(), sp.GetRequiredService<IEventBusSubscriptionManager>(), sp.GetRequiredService<ILogger<RabbitMQEventBus>>(), sp, "eventbus-exchange", "eventbus-queue");
                 eventBus.Subscribe<WriteLogEvent, IEventHandler<WriteLogEvent>>();
+                eventBus.Subscribe<WriteLogEvent, IEventHandler<WriteLogEvent>>();
                 eventBus.Subscribe<OrderInfoCreateEvent, IEventHandler<OrderInfoCreateEvent>>();
+
                 return eventBus;
             });
             services.AddTransient<IEventHandler<WriteLogEvent>, WriteLogEventHandler>();
+            services.AddTransient<IEventHandler<WriteLogEvent>, AnalyseLogEventHandler>();
             services.AddTransient<IEventHandler<OrderInfoCreateEvent>, OrderInfoCreateHandler>();
             services.AddControllers().AddNewtonsoftJson();
+            services.AddDistributedMemoryCache(options =>
+            {
+                options.ExpirationScanFrequency = TimeSpan.FromMinutes(5);
+                options.SizeLimit = 10;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
