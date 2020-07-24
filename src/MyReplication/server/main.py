@@ -10,7 +10,7 @@ from pymysqlreplication import BinLogStreamReader
 from pymysqlreplication.constants.FIELD_TYPE import DECIMAL
 from pymysqlreplication.row_event import (DeleteRowsEvent, UpdateRowsEvent, WriteRowsEvent)
 from datetime import date, datetime
-mysql_settings = {'host': '192.168.100.212', 'port': 3306, 'user': 'quantum', 'passwd': 'CS212SJK'}
+mysql_settings = {'host': '192.168.100.162', 'port': 3306, 'user': 'quantum', 'passwd': 'scmadmin'}
 
 class ComplexEncoder(json.JSONEncoder):
     def default(self, obj):

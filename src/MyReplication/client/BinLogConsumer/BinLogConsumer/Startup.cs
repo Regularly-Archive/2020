@@ -36,15 +36,15 @@ namespace BinLogConsumer
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
             services.AddSingleton<IEventBus, RabbitMQEventBus>(sp => {
                 var eventBus = new RabbitMQEventBus(sp.GetRequiredService<IRabbitMQPersistentConnection>(), sp.GetRequiredService<IEventBusSubscriptionManager>(), sp.GetRequiredService<ILogger<RabbitMQEventBus>>(), sp, "eventbus-exchange", "eventbus-queue");
-                eventBus.Subscribe<WriteLogEvent, IEventHandler<WriteLogEvent>>();
-                eventBus.Subscribe<WriteLogEvent, IEventHandler<WriteLogEvent>>();
-                eventBus.Subscribe<OrderInfoCreateEvent, IEventHandler<OrderInfoCreateEvent>>();
+                eventBus.Subscribe<WriteLogEvent, WriteLogEventHandler>();
+                eventBus.Subscribe<WriteLogEvent, AnalyseLogEventHandler>();
+                eventBus.Subscribe<OrderInfoCreateEvent, OrderInfoCreateHandler>();
 
                 return eventBus;
             });
-            services.AddTransient<IEventHandler<WriteLogEvent>, WriteLogEventHandler>();
-            services.AddTransient<IEventHandler<WriteLogEvent>, AnalyseLogEventHandler>();
-            services.AddTransient<IEventHandler<OrderInfoCreateEvent>, OrderInfoCreateHandler>();
+            services.AddTransient<WriteLogEventHandler>();
+            services.AddTransient<AnalyseLogEventHandler>();
+            services.AddTransient<OrderInfoCreateHandler>();
             services.AddControllers().AddNewtonsoftJson();
             services.AddDistributedMemoryCache(options =>
             {

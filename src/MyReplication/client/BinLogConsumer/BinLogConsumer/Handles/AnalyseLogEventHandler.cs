@@ -28,7 +28,6 @@ namespace BinLogConsumer.Handles
             else
                 cacheCount = (int.Parse(cacheCount) + 1).ToString();
 
-            _logger.LogInformation($"{@event.LOG_LEVEL}:{cacheCount}");
             _cache.SetString(@event.LOG_LEVEL, cacheCount); ;
             return Task.CompletedTask;
         }
