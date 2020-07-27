@@ -8,7 +8,7 @@ using System;
 using System.IO;
 using System.Net.Sockets;
 
-namespace BinLogConsumer.EventHandler
+namespace BinLogConsumer.EventBus
 {
     public class DefaultRabbitMQPersistentConnection
        : IRabbitMQPersistentConnection

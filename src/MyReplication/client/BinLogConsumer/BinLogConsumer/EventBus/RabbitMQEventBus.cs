@@ -15,7 +15,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 
-namespace BinLogConsumer.EventHandler
+namespace BinLogConsumer.EventBus
 {
     public class RabbitMQEventBus : IEventBus
     {
@@ -79,10 +79,12 @@ namespace BinLogConsumer.EventHandler
             if (!_persistentConnection.IsConnected) _persistentConnection.TryConnect();
 
             var queueName = GetQueueName(routingKey);
+
             var channel = _persistentConnection.CreateModel();
             channel.ExchangeDeclare(_exchangeName, "direct", true, false, null);
             channel.QueueDeclare(queueName, true, false, false, null);
             channel.QueueBind(queueName, _exchangeName, routingKey, null);
+
             var consumer = new EventingBasicConsumer(channel);
             consumer.Received += async (s, e) =>
             {

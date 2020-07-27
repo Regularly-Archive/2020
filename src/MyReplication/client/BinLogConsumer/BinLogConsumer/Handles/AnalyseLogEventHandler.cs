@@ -1,4 +1,4 @@
-﻿using BinLogConsumer.EventHandler;
+﻿using BinLogConsumer.EventBus;
 using BinLogConsumer.Events;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;

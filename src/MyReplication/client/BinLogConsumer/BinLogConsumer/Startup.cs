@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BinLogConsumer.EventHandler;
+using BinLogConsumer.EventBus;
 using BinLogConsumer.Events;
 using BinLogConsumer.Handles;
 using Microsoft.AspNetCore.Builder;
@@ -34,23 +34,14 @@ namespace BinLogConsumer
             services.AddSingleton<IEventBusSubscriptionManager, EventBusSubscriptionManager>(sp => new EventBusSubscriptionManager());
             services.AddSingleton<IConnectionFactory, ConnectionFactory>(sp => new ConnectionFactory() { HostName = "localhost", UserName = "guest", Password = "guest" });
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-            services.AddSingleton<IEventBus, RabbitMQEventBus>(sp => {
-                var eventBus = new RabbitMQEventBus(sp.GetRequiredService<IRabbitMQPersistentConnection>(), sp.GetRequiredService<IEventBusSubscriptionManager>(), sp.GetRequiredService<ILogger<RabbitMQEventBus>>(), sp, "eventbus-exchange", "eventbus-queue");
-                eventBus.Subscribe<WriteLogEvent, WriteLogEventHandler>();
-                eventBus.Subscribe<WriteLogEvent, AnalyseLogEventHandler>();
-                eventBus.Subscribe<OrderInfoCreateEvent, OrderInfoCreateHandler>();
-
-                return eventBus;
-            });
-            services.AddTransient<WriteLogEventHandler>();
-            services.AddTransient<AnalyseLogEventHandler>();
-            services.AddTransient<OrderInfoCreateHandler>();
             services.AddControllers().AddNewtonsoftJson();
             services.AddDistributedMemoryCache(options =>
             {
                 options.ExpirationScanFrequency = TimeSpan.FromMinutes(5);
                 options.SizeLimit = 10;
             });
+
+            services.AddEventBus();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

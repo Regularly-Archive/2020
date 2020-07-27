@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using BinLogConsumer.EventHandler;
+using BinLogConsumer.EventBus;
 using BinLogConsumer.Events;
 using BinLogConsumer.Models;
 using Microsoft.AspNetCore.Mvc;
