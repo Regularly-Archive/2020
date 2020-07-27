@@ -15,6 +15,7 @@ namespace BinLogConsumer.EventBus
     {
         public static void AddEventBus(this IServiceCollection services)
         {
+            //注册EventBus
             services.AddSingleton<IEventBus, RabbitMQEventBus>(sp =>
             {
                 var eventBus = new RabbitMQEventBus(sp.GetRequiredService<IRabbitMQPersistentConnection>(), sp.GetRequiredService<IEventBusSubscriptionManager>(), sp.GetRequiredService<ILogger<RabbitMQEventBus>>(), sp, "eventbus-exchange", "eventbus-queue");
@@ -22,6 +23,7 @@ namespace BinLogConsumer.EventBus
                 return eventBus;
             });
 
+            //注册EventHandlers
             var eventHandlers = GetEventHandlers();
             if (eventHandlers != null && eventHandlers.Any())
                 eventHandlers.ToList().ForEach(x => services.AddTransient(x));
@@ -34,7 +36,6 @@ namespace BinLogConsumer.EventBus
             var allAssemblies = new List<Assembly> { entryAssembly }.Concat(feferdAssemblies);
             return allAssemblies.SelectMany(x => x.DefinedTypes).ToList();
         }
-
 
         private static void SubscribeAll(this IEventBus eventBus)
         {
@@ -50,7 +51,7 @@ namespace BinLogConsumer.EventBus
 
             foreach(var eventType in allEventTypes)
             {
-                foreach (var eventHandlerType in allEventHandlerTypes.FindAll(x => typeof(IEventHandler<>).MakeGenericType(x).IsAssignableFrom(eventType)))
+                foreach (var eventHandlerType in allEventHandlerTypes.FindAll(x => typeof(IEventHandler<>).MakeGenericType(eventType).IsAssignableFrom(x)))
                 {
                     typeof(IEventBus).GetMethod("Subscribe").MakeGenericMethod(eventType, eventHandlerType).Invoke(eventBus, null);
                 }
