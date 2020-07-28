@@ -52,7 +52,7 @@ namespace BinLogConsumer.EventBus
 
                 var properties = channel.CreateBasicProperties();
                 properties.DeliveryMode = 2;
-                channel.BasicPublish(exchange: _exchangeName, routingKey: eventName, mandatory: true, basicProperties: null, body: body);
+                channel.BasicPublish(exchange: _exchangeName, routingKey: eventName, mandatory: true, basicProperties: properties, body: body);
                 _logger.LogDebug($"Publish message with RabbmitMQ BasicPublish: {message}");
             }
         }

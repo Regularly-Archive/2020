@@ -30,6 +30,6 @@ namespace BinLogConsumer.EventBus
 
         IEnumerable<Type> GetHandlersForEvent(string eventName);
 
-        string GetEventKey<T>();
+        string GetEventKey<T>() where T : EventBase;;
     }
 }
