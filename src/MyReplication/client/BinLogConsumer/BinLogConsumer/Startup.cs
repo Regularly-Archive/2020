@@ -41,7 +41,15 @@ namespace BinLogConsumer
                 options.SizeLimit = 10;
             });
 
+
             services.AddEventBus();
+            services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+            services.AddSingleton<ObjectPool<IModel>>(serviceProvider =>
+            {
+                var objectPoolProvider = serviceProvider.GetRequiredService<ObjectPoolProvider>();
+                var connectionFactory = serviceProvider.GetRequiredService<ConnectionFactory>();
+                return objectPoolProvider.Create(new ChannelObjectPoolPolicy(connectionFactory));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

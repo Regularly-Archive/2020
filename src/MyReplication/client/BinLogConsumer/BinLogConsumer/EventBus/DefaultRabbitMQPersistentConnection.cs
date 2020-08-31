@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 using Polly;
 using Polly.Retry;
 using RabbitMQ.Client;
@@ -17,15 +18,17 @@ namespace BinLogConsumer.EventBus
         private readonly ILogger<DefaultRabbitMQPersistentConnection> _logger;
         private readonly int _retryCount;
         IConnection _connection;
+        private readonly ObjectPool<IModel> _channelPool;
         bool _disposed;
 
         object sync_root = new object();
 
-        public DefaultRabbitMQPersistentConnection(IConnectionFactory connectionFactory, ILogger<DefaultRabbitMQPersistentConnection> logger, int retryCount = 5)
+        public DefaultRabbitMQPersistentConnection(IConnectionFactory connectionFactory, ILogger<DefaultRabbitMQPersistentConnection> logger, ObjectPool<IModel> channelPool, int retryCount = 5)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _retryCount = retryCount;
+            _channelPool = channelPool;
         }
 
         public bool IsConnected
@@ -43,7 +46,7 @@ namespace BinLogConsumer.EventBus
                 throw new InvalidOperationException("No RabbitMQ connections are available to perform this action");
             }
 
-            return _connection.CreateModel();
+            return _channelPool.Get();
         }
 
         public void Dispose()
@@ -127,6 +130,11 @@ namespace BinLogConsumer.EventBus
             _logger.LogWarning("A RabbitMQ connection is on shutdown. Trying to re-connect...");
 
             TryConnect();
+        }
+
+        public void ReturnModel(IModel obj)
+        {
+            _channelPool.Return(obj);
         }
     }
 }

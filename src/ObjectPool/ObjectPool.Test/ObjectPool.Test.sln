@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinLogConsumer", "BinLogConsumer\BinLogConsumer.csproj", "{0372A17E-EEB8-47EA-BC2A-4327B858924B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectPool.Test", "ObjectPool.Test\ObjectPool.Test.csproj", "{B1292F41-83DC-49CC-9061-F805E8BE795C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0372A17E-EEB8-47EA-BC2A-4327B858924B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0372A17E-EEB8-47EA-BC2A-4327B858924B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0372A17E-EEB8-47EA-BC2A-4327B858924B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0372A17E-EEB8-47EA-BC2A-4327B858924B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1292F41-83DC-49CC-9061-F805E8BE795C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1292F41-83DC-49CC-9061-F805E8BE795C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1292F41-83DC-49CC-9061-F805E8BE795C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1292F41-83DC-49CC-9061-F805E8BE795C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C2587C4A-3BFE-492D-8249-B64BF102F898}
+		SolutionGuid = {69463689-C2F4-4708-9D12-AE9FEB8F3228}
 	EndGlobalSection
 EndGlobal

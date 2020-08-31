@@ -11,5 +11,7 @@ namespace BinLogConsumer.EventBus
         bool TryConnect();
 
         IModel CreateModel();
+
+        void ReturnModel(IModel obj);
     }
 }
