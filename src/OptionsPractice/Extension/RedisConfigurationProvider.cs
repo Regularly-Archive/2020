@@ -20,7 +20,11 @@ namespace OptionsPractice.Extension
         {
             _options = options;
             _redisClient = new CSRedisClient(_options.ConnectionString);
-            _redisClient.Subscribe((_options.HashCacheChannel, msg => Load()));
+            if (options.AutoReload)
+            {
+                //利用Redis的发布-订阅重新加载配置
+                _redisClient.Subscribe((_options.HashCacheChannel, msg => Load()));
+            }
         }
 
         public override void Load()

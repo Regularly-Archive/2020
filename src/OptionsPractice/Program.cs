@@ -23,6 +23,7 @@ namespace OptionsPractice
                 {
                     configurationBuilder.AddRedisConfiguration(new Models.RedisConfigurationOptions()
                     {
+                        AutoReload = true,
                         ConnectionString = "127.0.0.1:6379",
                         HashCacheKey = "aspnet:config",
                         HashCacheChannel = "aspnet:config:change"
