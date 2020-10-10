@@ -42,6 +42,16 @@ namespace OptionsPractice
 
             });
 
+            //Ð´·¨5
+            services.Configure<AppInfoOptions>(options =>
+            {
+                options.AppName = "ASP.NET Core";
+                options.AppVersion = "1.2.1";
+            });
+
+            //Ð´·¨6
+            var appInfoOptions = Configuration.Get<AppInfoOptions>();
+
             services.AddControllers();
         }
 
