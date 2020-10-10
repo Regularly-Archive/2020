@@ -1,9 +1,11 @@
 ﻿using DotLiquid;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml;
 
 namespace MessageExchange.Extension
 {
@@ -54,6 +56,18 @@ namespace MessageExchange.Extension
             }
 
             return resultHash;
+        }
+
+        /// <summary>
+        /// 解析Xml
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        public static Hash FromXml(XmlDocument document)
+        {
+            var json = JsonConvert.SerializeXmlNode(document);
+            var obj = JObject.Parse(json);
+            return FromJson(obj);
         }
 
         /// <summary>
