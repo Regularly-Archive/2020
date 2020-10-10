@@ -9,6 +9,11 @@ namespace MessageExchange.Extension
 {
     public static class DotLiquidExtension
     {
+        /// <summary>
+        /// 解析JObject
+        /// </summary>
+        /// <param name="jObject"></param>
+        /// <returns></returns>
         public static Hash FromJson(JObject jObject)
         {
             var resultHash = new Hash();
@@ -51,15 +56,20 @@ namespace MessageExchange.Extension
             return resultHash;
         }
 
-        private static List<Hash> FromJson(JArray jsonArray)
+        /// <summary>
+        /// 解析JArray
+        /// </summary>
+        /// <param name="jArray"></param>
+        /// <returns></returns>
+        private static List<Hash> FromJson(JArray jArray)
         {
-            if (jsonArray == null)
+            if (jArray == null)
                 return null;
 
             var listHash = new List<Hash>();
-            for (int i = 0; i < jsonArray.Count; i++)
+            for (int i = 0; i < jArray.Count; i++)
             {
-                var item = (JObject)jsonArray[i];
+                var item = (JObject)jArray[i];
                 var value = FromJson(item);
                 if (value != null) {
                     listHash.Add(FromJson(item));
