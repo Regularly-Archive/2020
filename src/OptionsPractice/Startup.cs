@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using OptionsPractice.Models;
 
 namespace OptionsPractice
@@ -36,21 +38,13 @@ namespace OptionsPractice
             //写法3
             services.Configure<LearningOptions>(Configuration.GetSection("Learning"));
 
-            //写法4
-            services.PostConfigure<LearningOptions>(options =>
-            {
-
-            });
-
-            //写法5
-            services.Configure<AppInfoOptions>(options =>
-            {
-                options.AppName = "ASP.NET Core";
-                options.AppVersion = "1.2.1";
-            });
 
             //写法6
-            var appInfoOptions = Configuration.Get<AppInfoOptions>();
+            services.Configure<AppInfoOptions>(Configuration.GetSection("App"));
+
+
+            services.Configure<ThemeOptions>("DarkTheme", Configuration.GetSection("Themes:Dark"));
+            services.Configure<ThemeOptions>("WhiteTheme", Configuration.GetSection("Themes:White"));
 
             services.AddControllers();
         }

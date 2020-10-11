@@ -8,6 +8,7 @@ namespace OptionsPractice.Models
     [Serializable]
     public class LearningOptions
     {
+        public decimal Years { get; set; }
         public List<string> Topic { get; set; }
         public List<SkillItem> Skill { get; set; }
     }

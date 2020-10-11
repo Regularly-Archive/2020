@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OptionsPractice.Extension
 {
-    public static class RedisExtensions
+    public static class RedisConfigurationExtensions
     {
         public static IConfigurationBuilder AddRedisConfiguration(this IConfigurationBuilder builder, RedisConfigurationOptions options)
         {

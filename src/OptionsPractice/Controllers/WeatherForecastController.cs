@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using OptionsPractice.Models;
 
@@ -25,6 +28,8 @@ namespace OptionsPractice.Controllers
 
         private readonly IOptions<LearningOptions> _learningOptions;
 
+        private readonly IOptionsSnapshot<ThemeOptions> _themeOptionsSnapshot;
+
         private readonly IOptionsSnapshot<LearningOptions> _learningOptionsSnapshot;
 
         private readonly IOptionsMonitor<LearningOptions> _learningOptionsMonitor;
@@ -36,6 +41,7 @@ namespace OptionsPractice.Controllers
             IOptions<LearningOptions> learningOptions, 
             IOptionsSnapshot<LearningOptions> learningOptionsSnapshot, 
             IOptionsMonitor<LearningOptions> learningOptionsMonitor,
+            IOptionsSnapshot<ThemeOptions> themeOptionsSnapshot,
             IConfiguration configuration
             )
         {
@@ -44,11 +50,22 @@ namespace OptionsPractice.Controllers
             _learningOptionsSnapshot = learningOptionsSnapshot;
             _learningOptionsMonitor = learningOptionsMonitor;
             _configuration = configuration;
+            _themeOptionsSnapshot = themeOptionsSnapshot;
             _learningOptionsMonitor.OnChange((options, value) =>
             {
                 _logger.LogInformation($"OnChnage => {JsonConvert.SerializeObject(options)}");
             });
 
+            //ChangeToken + IFileProvider 实现对文件的监听
+            var filePath = @"C:\Users\admin\Downloads\德利得-三星发货订单接口测试流程.txt";
+            var directory = System.IO.Path.GetDirectoryName(filePath);
+            var fileProvider = new PhysicalFileProvider(directory);
+            ChangeToken.OnChange(
+                () => fileProvider.Watch("德利得-三星发货订单接口测试流程.txt"),
+                () => {
+                    _logger.LogInformation("孔乙己，你一定又偷人家书了吧");
+                }
+            );
         }
 
         [HttpGet]
@@ -65,15 +82,22 @@ namespace OptionsPractice.Controllers
         }
 
         [HttpGet("{action}")]
-        public LearningOptions GetOptions()
+        public ActionResult GetOptions()
         {
-            return _learningOptionsSnapshot.Value;
+            var builder = new StringBuilder();
+            builder.AppendLine("learningOptions:");
+            builder.AppendLine(JsonConvert.SerializeObject(_learningOptions.Value));
+            builder.AppendLine("learningOptionsSnapshot:");
+            builder.AppendLine(JsonConvert.SerializeObject(_learningOptionsSnapshot.Value));
+            builder.AppendLine("learningOptionsMonitor:");
+            builder.AppendLine(JsonConvert.SerializeObject(_learningOptionsMonitor.CurrentValue));
+            return Content(builder.ToString());
         }
 
         [HttpGet("{action}")]
         public AppInfoOptions GetConfiguration()
         {
-            return _configuration.Get<AppInfoOptions>();
+            return _configuration.GetSection("App").Get<AppInfoOptions>();
         }
     }
 }
