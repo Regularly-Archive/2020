@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.35" />
+    <PackageReference Include="nunit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.80" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dapper.Contrib.SqlAdapters\Dapper.Contrib.SqlAdapters.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Dapper.Contrib">
+      <HintPath>..\Dapper\Dapper.Contrib\bin\Debug\netstandard2.0\Dapper.Contrib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
