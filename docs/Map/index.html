@@ -155,18 +155,18 @@
             for (let order of orders) {
                 if (IsPointInCircle(e.overlay.getCenter(), e.overlay.getRadius(), order.point)) {
                     selected += 1;
-                    overlay._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
+                    order.marker._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
                 } else {
-                    overlay._config.icon = new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32));
+                    order.marker._config.icon = new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32));
                 }
             }
         } else {
             for (let order of orders) {
                 if (IsPointInPolygon(e.overlay.getPath(), order.point)) {
                     selected += 1;
-                    overlay._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
+                    order.marker._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
                 } else {
-                    overlay._config.icon = new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32));
+                    order.marker._config.icon = new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32));
                 }
             }
         }
