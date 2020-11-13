@@ -87,11 +87,13 @@
     };
 
     function IsPointInPolygon(points, target) {
+        console.log(points);
         var polygon = new BMapGL.Polygon(points);
         return BMapGLLib.GeoUtils.isPointInPolygon(target, polygon);
     }
 
     function IsPointInCircle(center, redius, target) {
+        console.log(center, redius);
         var circle = new BMapGL.Circle(center, redius);
         return BMapGLLib.GeoUtils.isPointInCircle(pt, circle);
     }
@@ -149,7 +151,7 @@
         let selected = 0;
         if (e.drawingMode == 'circle') {
             for (let overlay of overlays) {
-                if (isPointInCircle(e.overlay.getCenter(), e.overlay.getRadius(), overlay.point)) {
+                if (IsPointInCircle(e.overlay.getCenter(), e.overlay.getRadius(), overlay.point)) {
                     selected += 1;
                     overlay._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
                 } else {
