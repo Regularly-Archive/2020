@@ -88,6 +88,7 @@
 
     function IsPointInPolygon(points, target) {
         console.log(points);
+        console.log(target);
         var polygon = new BMapGL.Polygon(points);
         return BMapGLLib.GeoUtils.isPointInPolygon(target, polygon);
     }
