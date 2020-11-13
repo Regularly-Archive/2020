@@ -148,7 +148,6 @@
         let selected = 0;
         if (e.drawingMode == 'circle') {
             for (let overlay of overlays) {
-                console.log(e.overlay);
                 if (isPointInCircle(e.overlay.point, e.overlay.redius, overlay.point)) {
                     selected += 1;
                     overlay._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
@@ -158,7 +157,6 @@
             }
         } else {
             for (let overlay of overlays) {
-                console.log(e.overlay);
                 if (IsPointInPolygon(e.overlay.points, overlay.point)) {
                     selected += 1;
                     overlay._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
@@ -173,7 +171,7 @@
 
     function draw(e) {
         var arr = document.getElementsByClassName('bmap-btn');
-        for(var i = 0; i<arr.length; i++) {
+        for(var i = 0; i < arr.length; i++) {
             arr[i].style.backgroundPositionY = '0';
         }
         e.style.backgroundPositionY = '-52px';
