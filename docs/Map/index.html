@@ -158,7 +158,7 @@
             for (let order of orders) {
                 if (!e.overlay.getBounds().containsPoint(order.point)) continue;
                 if (order.isSelected) continue;
-                if (IsPointInCircle(e.overlay.getCenter(), reduis, order.point) && order.isSelected) {
+                if (IsPointInCircle(e.overlay.getCenter(), reduis, order.point) && !order.isSelected) {
                     selected += 1;
                     order.marker.setIcon(new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32)));
                     order.marker.setTitle(order.title);
@@ -174,7 +174,7 @@
             for (let order of orders) {
                 if (!e.overlay.getBounds().containsPoint(order.point)) continue;
                 if (order.isSelected) continue;
-                if (IsPointInPolygon(points, order.point) && order.isSelected) {
+                if (IsPointInPolygon(points, order.point) && !order.isSelected) {
                     selected += 1;
                     order.marker.setIcon(new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32)));
                     order.marker.setTitle(new order.title);
