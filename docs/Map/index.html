@@ -149,24 +149,33 @@
 
     drawingManager.addEventListener('overlaycomplete', function(e) {
         console.log(e);
-        let area = e.calculate;
+        let area = 0;
         let selected = 0;
         if (e.drawingMode == 'circle') {
+            let reduis = e.overlay.getRadius();
+            area = Math.PI * reduis * reduis;
             for (let order of orders) {
-                if (IsPointInCircle(e.overlay.getCenter(), e.overlay.getRadius(), order.point)) {
+                if (IsPointInCircle(e.overlay.getCenter(), reduis, order.point)) {
                     selected += 1;
-                    order.marker._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
+                    order.marker.setIcon(new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32)));
+                    order.marker.setLabel(order.point.lng + ',' + order.point.lat);
                 } else {
-                    order.marker._config.icon = new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32));
+                    order.marker.setIcon(new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32)));
+                    order.marker.setLabel('');
                 }
             }
         } else {
+            let points = e.overlay.getPath();
+            let polygon = new BMapGL.Polygon(points);
+            area = BMapGLLib.GeoUtils.getPolygonArea(polygon);
             for (let order of orders) {
-                if (IsPointInPolygon(e.overlay.getPath(), order.point)) {
+                if (IsPointInPolygon(points, order.point)) {
                     selected += 1;
-                    order.marker._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
+                    order.marker.setIcon(new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32)));
+                    order.marker.setLabel(order.point.lng + ',' + order.point.lat);
                 } else {
-                    order.marker._config.icon = new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32));
+                    order.marker.setIcon(new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32)));
+                    order.marker.setLabel('');
                 }
             }
         }
