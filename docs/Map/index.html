@@ -99,6 +99,10 @@
         labelOptions: labelOptions,      // label样式
     });  
 
+    drawingManager.addEventListener('overlaycomplete', function(e){
+        alter(e);
+    });
+
     function draw(e) {
         var arr = document.getElementsByClassName('bmap-btn');
         for(var i = 0; i<arr.length; i++) {
