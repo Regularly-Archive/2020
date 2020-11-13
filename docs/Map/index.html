@@ -110,11 +110,12 @@
     var orders = [];
     for (let latlng of latlngs) {
         let point = new BMapGL.Point(latlng.lng, latlng.lat);
+        let title = latlng.lng + ',' + latlng.lat
         let marker = new BMapGL.Marker(point, {
             icon: new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32))
         });
         map.addOverlay(marker);
-        orders.push({marker:marker, point:point});
+        orders.push({marker:marker, point:point, title: title, isSelected: false});
     }
 
     var styleOptions = {
@@ -156,10 +157,10 @@
             area = Math.PI * reduis * reduis;
             for (let order of orders) {
                 if (!e.overlay.getBounds().containsPoint(order.point)) continue;
-                if (IsPointInCircle(e.overlay.getCenter(), reduis, order.point)) {
+                if (IsPointInCircle(e.overlay.getCenter(), reduis, order.point) && order.isSelected) {
                     selected += 1;
                     order.marker.setIcon(new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32)));
-                    order.marker.setLabel(order.point.lng + ',' + order.point.lat);
+                    order.marker.setLabel(order.title);
                 } else {
                     order.marker.setIcon(new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32)));
                     order.marker.setLabel('');
@@ -171,10 +172,10 @@
             area = BMapGLLib.GeoUtils.getPolygonArea(polygon);
             for (let order of orders) {
                 if (!e.overlay.getBounds().containsPoint(order.point)) continue;
-                if (IsPointInPolygon(points, order.point)) {
+                if (IsPointInPolygon(points, order.point) && order.isSelected) {
                     selected += 1;
                     order.marker.setIcon(new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32)));
-                    order.marker.setLabel(order.point.lng + ',' + order.point.lat);
+                    order.marker.setLabel(order.title);
                 } else {
                     order.marker.setIcon(new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32)));
                     order.marker.setLabel('');
