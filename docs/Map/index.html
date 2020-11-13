@@ -92,6 +92,7 @@
     
     var points = getPoints(500);
     for (let point of points) {
+        console.log(point);
         let marker = new BMapGL.Marker(new BMapGL.Point(point.lng, point.lat));
         map.addOverlay(marker);
     }                              // 开启鼠标滚轮缩放
