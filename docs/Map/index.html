@@ -106,14 +106,15 @@
 	map.centerAndZoom(new BMapGL.Point(116.404, 39.915), 8);      // 初始化地图,设置中心点坐标和地图级别
     map.enableScrollWheelZoom(true); 
     
-    var points = getPoints(1);
-    var overlays = [];
-    for (let point of points) {
-        let marker = new BMapGL.Marker(new BMapGL.Point(point.lng, point.lat), {
+    var latlngs = getPoints(1);
+    var orders = [];
+    for (let latlng of latlngs) {
+        let point = new BMapGL.Point(latlng.lng, latlng.lat);
+        let marker = new BMapGL.Marker(point, {
             icon: new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32))
         });
         map.addOverlay(marker);
-        overlays.push(marker);
+        orders.push({marker:marker, point:point});
     }
 
     var styleOptions = {
@@ -151,8 +152,8 @@
         let area = e.calculate;
         let selected = 0;
         if (e.drawingMode == 'circle') {
-            for (let overlay of overlays) {
-                if (IsPointInCircle(e.overlay.getCenter(), e.overlay.getRadius(), overlay.point)) {
+            for (let order of orders) {
+                if (IsPointInCircle(e.overlay.getCenter(), e.overlay.getRadius(), order.point)) {
                     selected += 1;
                     overlay._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
                 } else {
