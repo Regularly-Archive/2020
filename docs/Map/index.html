@@ -155,6 +155,7 @@
             let reduis = e.overlay.getRadius();
             area = Math.PI * reduis * reduis;
             for (let order of orders) {
+                if (!e.overlay.getBounds().containsPoint(order.point)) continue;
                 if (IsPointInCircle(e.overlay.getCenter(), reduis, order.point)) {
                     selected += 1;
                     order.marker.setIcon(new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32)));
@@ -169,6 +170,7 @@
             let polygon = new BMapGL.Polygon(points);
             area = BMapGLLib.GeoUtils.getPolygonArea(polygon);
             for (let order of orders) {
+                if (!e.overlay.getBounds().containsPoint(order.point)) continue;
                 if (IsPointInPolygon(points, order.point)) {
                     selected += 1;
                     order.marker.setIcon(new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32)));
