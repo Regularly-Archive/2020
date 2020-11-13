@@ -6,6 +6,7 @@
 	<script type="text/javascript" src="https://api.map.baidu.com/api?type=webgl&v=1.0&ak=CE44c78c410e2c801253586c748d43f6&s=1"></script>
     <link href="//mapopen.cdn.bcebos.com/github/BMapGLLib/DrawingManager/src/DrawingManager.min.css" rel="stylesheet">
     <script type="text/javascript" src="//mapopen.cdn.bcebos.com/github/BMapGLLib/DrawingManager/src/DrawingManager.min.js"></script>
+    <script type="text/javascript" src="//api.map.baidu.com/library/GeoUtils/1.2/src/GeoUtils_min.js"></script>
     <title>基于WebGL的大量覆盖物交互案例</title>
     <style type="text/css">
         body, html, #container {
@@ -84,6 +85,16 @@
         var seed = Math.random();
         return min + Math.round(seed * diff);
     };
+
+    function IsPointInPolygon(points, target) {
+        var polygon = new BMap.Polygon(points);
+        return BMapLib.GeoUtils.isPointInPolygon(target, polygon);
+    }
+
+    function IsPointInCircle(center, redius, target) {
+        var circle = new BMap.Circle(center, redius);
+        return BMapLib.GeoUtils.isPointInCircle(pt, circle);
+    }
 </script>
 <script type="text/javascript">
     var ICON_BLUE = 'https://i.loli.net/2020/11/13/aLJubQGE3czWw5P.png';
@@ -93,12 +104,14 @@
     map.enableScrollWheelZoom(true); 
     
     var points = getPoints(5000);
+    var overlays = [];
     for (let point of points) {
         let marker = new BMapGL.Marker(new BMapGL.Point(point.lng, point.lat), {
             icon: new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32))
         });
         map.addOverlay(marker);
-    }                              // 开启鼠标滚轮缩放
+        overlays.push(marker);
+    }
 
     var styleOptions = {
         strokeColor: '#5E87DB',   // 边线颜色
@@ -131,7 +144,29 @@
     });  
 
     drawingManager.addEventListener('overlaycomplete', function(e){
-        console.log(e);
+        let area = e.calculate;
+        let selected = 0;
+        if (e.drawingMode == 'circle') {
+            for (let overlay of overlays) {
+                if (isPointInCircle(e.overlay.point, e.overlay.redius, overlay.point)) {
+                    selected += 1;
+                    overlay._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
+                } else {
+                    overlay._config.icon = new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32));
+                }
+            }
+        } else {
+            for (let overlay of overlays) {
+                if (IsPointInPolygon(e.overlay.points, overlay.point)) {
+                    selected += 1;
+                    overlay._config.icon = new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32));
+                } else {
+                    overlay._config.icon = new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32));
+                }
+            }
+        }
+
+        alert(`当前区域内共有：${selected} 个点，总面积为：${area} 平方米);
     });
 
     function draw(e) {
