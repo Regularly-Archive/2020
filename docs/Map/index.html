@@ -70,7 +70,9 @@
         for (let i = 0; i < max; i++) {
             let lat = GetRandomValue(1, 10) + Math.random();
             var lng = GetRandomValue(1, 10) + Math.random();
-            var point = { lat = lat, lng = lng };
+            var point = {}
+            point.lat = lat;
+            point.lng = lng;
             points.push(point);
         }
 
