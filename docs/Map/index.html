@@ -90,7 +90,7 @@
 	map.centerAndZoom(new BMapGL.Point(116.404, 39.915), 11);      // 初始化地图,设置中心点坐标和地图级别
     map.enableScrollWheelZoom(true); 
     
-    var points = getPoints();
+    var points = getPoints(5000);
     for (let point of points) {
         let marker = new BMapGL.Marker(new BMapGL.Point(point.lng, point.lat));
         map.addOverlay(marker);
