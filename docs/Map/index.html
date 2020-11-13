@@ -157,13 +157,14 @@
             area = Math.PI * reduis * reduis;
             for (let order of orders) {
                 if (!e.overlay.getBounds().containsPoint(order.point)) continue;
+                if (order.isSelected) continue;
                 if (IsPointInCircle(e.overlay.getCenter(), reduis, order.point) && order.isSelected) {
                     selected += 1;
                     order.marker.setIcon(new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32)));
-                    order.marker.setLabel(order.title);
+                    order.marker.setTitle(order.title);
                 } else {
                     order.marker.setIcon(new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32)));
-                    order.marker.setLabel('');
+                    order.marker.setTitle('');
                 }
             }
         } else {
@@ -172,13 +173,14 @@
             area = BMapGLLib.GeoUtils.getPolygonArea(polygon);
             for (let order of orders) {
                 if (!e.overlay.getBounds().containsPoint(order.point)) continue;
+                if (order.isSelected) continue;
                 if (IsPointInPolygon(points, order.point) && order.isSelected) {
                     selected += 1;
                     order.marker.setIcon(new BMapGL.Icon(ICON_RED, new BMapGL.Size(32, 32)));
-                    order.marker.setLabel(order.title);
+                    order.marker.setTitle(new order.title);
                 } else {
                     order.marker.setIcon(new BMapGL.Icon(ICON_BLUE, new BMapGL.Size(32, 32)));
-                    order.marker.setLabel('');
+                    order.marker.setTitle('');
                 }
             }
         }
