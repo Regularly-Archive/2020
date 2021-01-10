@@ -16,7 +16,7 @@
     var vm = new Vue({
         el: '#app',
         data: {
-            url: '',
+            url: 'https://regularly-archive.github.io/2020/Matrix/',
         },
         methods: {
             capture: function() {
@@ -25,7 +25,7 @@
                 var iframeBody = iframe.document.getElementsByTagName('body')[0]
                 html2canvas(iframeBody).then(canvas => {
                     document.body.appendChild(canvas);
-                    //Canvas转图片
+                    //canvas转图片
                     let canvasImg = canvas.toDataURL("image/png");
                     //模拟下载
                     var a = document.createElement('a')
